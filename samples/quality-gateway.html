@@ -17,7 +17,7 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
-body { font-family: var(--sans); background: var(--doc-bg); color: var(--doc-fg); -webkit-font-smoothing: antialiased; }
+body { font-family: var(--sans); background: var(--doc-bg); color: var(--doc-fg); -webkit-font-smoothing: antialiased; line-height: 1.5; }
 .doc { max-width: 1320px; margin: 0 auto; padding: 32px 24px 64px; }
 .doc-head { margin-bottom: 22px; border-bottom: 1px solid var(--doc-border); padding-bottom: 18px; }
 .doc-head h1 { margin: 0 0 6px; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
@@ -26,7 +26,6 @@ body { font-family: var(--sans); background: var(--doc-bg); color: var(--doc-fg)
 .pill.path { background: #EEF2FF; color: #4338CA; font-family: var(--mono); font-weight: 500; }
 .pill.recon { background: #0F172A; color: #F1F5F9; font-weight: 600; }
 .pill.recon b { color: #94A3B8; font-weight: 400; margin-right: 4px; }
-.pill.recon span { color: #F1F5F9; }
 .recon-row { margin-top: 10px; line-height: 2; }
 .kpi-row { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
 .kpi { background: #fff; border: 1px solid var(--doc-border); border-radius: 8px; padding: 8px 12px; font-size: 12px; display: flex; flex-direction: column; gap: 2px; min-width: 130px; }
@@ -60,6 +59,11 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
 .axis-card .head .num { font-family: var(--mono); font-weight: 700; color: var(--doc-fg-dim); font-size: 12px; }
 .axis-card .head .axis-name { font-size: 14px; font-weight: 700; }
 .axis-card .head .scope { font-family: var(--mono); font-size: 11px; color: var(--doc-fg-dim); margin-left: auto; }
+.axis-card .finding { margin-top: 10px; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 10px 12px; font-size: 12.5px; }
+.axis-card .finding.major-finding { background: #FEF2F2; border-color: #FECACA; }
+.axis-card .finding .lead { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #92400E; font-weight: 700; margin-bottom: 4px; }
+.axis-card .finding.major-finding .lead { color: #B91C1C; }
+.axis-card .finding .body code { font-family: var(--mono); background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 3px; font-size: 11.5px; }
 .axis-card .evidence { margin-top: 12px; background: #FAFBFC; border: 1px solid var(--doc-border); border-radius: 8px; padding: 10px 12px; font-size: 12px; }
 .axis-card .evidence .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--doc-fg-dim); font-weight: 700; }
 .axis-card .evidence ul { margin: 6px 0 0; padding-left: 18px; }
@@ -78,9 +82,13 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
 .axis-card .code .tok { color: #86EFAC; }
 .axis-card .code .cmt { color: #64748B; font-style: italic; }
 .axis-card .delta-row { margin-top: 10px; font-size: 11px; font-family: var(--mono); color: var(--good); font-weight: 600; }
-.axis-card.ok-card .single { margin-top: 10px; padding: 12px 14px; background: var(--good-bg); border: 1px solid var(--good-border); border-radius: 8px; font-size: 12px; color: #14532D; line-height: 1.5; }
-.axis-card.na-card .single { margin-top: 10px; padding: 12px 14px; background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 12px; color: #475569; line-height: 1.5; }
-
+.axis-card.ok-card .single { margin-top: 10px; padding: 12px 14px; background: var(--good-bg); border: 1px solid var(--good-border); border-radius: 8px; font-size: 12px; color: #14532D; line-height: 1.55; }
+.axis-card.na-card .single { margin-top: 10px; padding: 12px 14px; background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 12px; color: #475569; line-height: 1.55; }
+.native-alert { background: #ECECEC; border: 1px solid #B8B8B8; border-radius: 10px; padding: 18px 22px; max-width: 320px; box-shadow: 0 12px 30px rgba(0,0,0,0.2); font-family: -apple-system, sans-serif; }
+.native-alert .msg { font-size: 13px; color: #111; margin-bottom: 14px; }
+.native-alert .row { display: flex; gap: 8px; justify-content: flex-end; }
+.native-alert .btn { font-size: 13px; padding: 5px 14px; border-radius: 5px; cursor: pointer; background: #fff; border: 1px solid #B8B8B8; }
+.native-alert .btn.primary { background: #007AFF; color: white; border: 0; }
 .context-wrap { background: #fff; border: 1px solid var(--doc-border); border-radius: 12px; padding: 16px; margin-top: 16px; }
 .context-pair { display: grid; grid-template-columns: 1fr; gap: 14px; }
 @media (min-width: 1200px) { .context-pair { grid-template-columns: 1fr 1fr; } }
@@ -106,8 +114,6 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
 .pm-chip.error   { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
 .pm-chip.warning { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
 .pm-chip.info    { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
-.pm-spinner { display: inline-block; width: 11px; height: 11px; border: 2px solid #CBD5E1; border-top-color: #0F172A; border-radius: 99px; animation: spin 1s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
 .pm-table { background: #fff; border: 1px solid var(--doc-border); border-radius: 8px; overflow: hidden; }
 .pm-table.fixed { border-radius: 12px; }
 .pm-table-row { display: grid; grid-template-columns: 0.7fr 1.4fr 1fr 0.9fr 0.7fr; gap: 8px; padding: 8px 12px; font-size: 11.5px; border-bottom: 1px solid var(--doc-border); align-items: center; }
@@ -125,19 +131,19 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
     <div class="sub">
       <span class="pill path">/Users/sumedh/Documents/intentwise-quality-gateway/frontend</span>
       <div class="recon-row">
-        <span class="pill recon"><b>stack</b><span>web</span></span>
-        <span class="pill recon"><b>framework</b><span>react (vite)</span></span>
-        <span class="pill recon"><b>styling</b><span>tailwind</span></span>
-        <span class="pill recon"><b>tokens</b><span>tailwind-config</span></span>
-        <span class="pill recon"><b>primitives</b><span>radix</span></span>
-        <span class="pill recon"><b>tree</b><span>standard-tree</span></span>
-        <span class="pill recon"><b>files</b><span>33</span></span>
+        <span class="pill recon"><b>stack</b>web</span>
+        <span class="pill recon"><b>framework</b>react (vite)</span>
+        <span class="pill recon"><b>styling</b>tailwind</span>
+        <span class="pill recon"><b>tokens</b>tailwind-config</span>
+        <span class="pill recon"><b>primitives</b>radix + components/ (14)</span>
+        <span class="pill recon"><b>tree</b>standard-tree</span>
+        <span class="pill recon"><b>files</b>33</span>
       </div>
     </div>
     <div class="kpi-row">
       <div class="kpi major"><div class="label">Major</div><div class="val">2</div></div>
-      <div class="kpi sig"><div class="label">Significant</div><div class="val">5</div></div>
-      <div class="kpi min"><div class="label">Minor</div><div class="val">4</div></div>
+      <div class="kpi sig"><div class="label">Significant</div><div class="val">6</div></div>
+      <div class="kpi min"><div class="label">Minor</div><div class="val">3</div></div>
       <div class="kpi ok"><div class="label">OK / OK · N/A</div><div class="val">3</div></div>
     </div>
   </header>
@@ -147,146 +153,243 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
     <span class="item fixed"><span class="dot"></span>Resolved in AFTER</span>
   </div>
 
-  <h2 class="section-title">Axis catalog <span class="sub">14 rows · status + headline finding + supporting volume</span></h2>
+  <h2 class="section-title">Axis catalog <span class="sub">14 rows · status + named-component finding + supporting volume</span></h2>
   <table class="catalog">
     <thead>
       <tr><th>#</th><th>Axis</th><th>Status</th><th>Headline finding</th><th>Volume</th></tr>
     </thead>
     <tbody>
-      <tr><td class="id">A01</td><td class="name">Primitives</td><td><span class="status minor">Minor</span></td><td>Radix + small components/ dir; <code>&lt;StatusBadge&gt;</code> is a strong primitive. Inline <code>Section</code> duplicated across 3 pages.</td><td class="vol">StatusBadge: used widely · Section: 3 inline copies</td></tr>
-      <tr><td class="id">A02</td><td class="name">Library convention</td><td><span class="status minor">Minor</span></td><td>StatusBadge has a tone-keyed lookup; Pagination, ScoreCard wrap their own className recipes (no enum).</td><td class="vol">StatusBadge tone map: 10 keys (success/error/warning/info/pending/...)</td></tr>
-      <tr><td class="id">A03</td><td class="name">Application convention</td><td><span class="status minor">Minor</span></td><td>PageHeader + useQueryFilters exist and adopted on 7 of 9 pages. Alerts + Issues bypass with inline h1; <code>Section</code> primitive duplicated in QueryExplorer, Dashboard, Organizations.</td><td class="vol">PageHeader: 7 pages · useQueryFilters: 6 pages · Section: 3 inline copies</td></tr>
-      <tr><td class="id">A04</td><td class="name">Color tokens</td><td><span class="status significant">Significant</span></td><td>10 files import <code>gray-*</code> classes (82 hits). Alerts.tsx alone has 25 gray-* usages. Zinc creep on QueryExplorer + Evaluations skeleton rows.</td><td class="vol">gray-* files: 10 · total hits: 82 · zinc creep (pages): 2</td></tr>
-      <tr><td class="id">A05</td><td class="name">Typography</td><td><span class="status significant">Significant</span></td><td>20+ distinct eyebrow label className recipes — tracking-wider vs tracking-wide, text-[10px] vs text-xs, slate-500 vs slate-400. 2 inline h1s (Alerts, Issues).</td><td class="vol">eyebrow variants: ~20 · h1 variants: 2 (PageHeader-bypass)</td></tr>
-      <tr><td class="id">A06</td><td class="name">Radii</td><td><span class="status minor">Minor</span></td><td>Scale uses md / lg / xl + bare <code>rounded</code> — distribution is reasonable but no canonical "card radius" call-out (mix of lg + xl on bg-white surfaces).</td><td class="vol">md 46 · lg 45 · xl 36 · full 31 · bare 200</td></tr>
-      <tr><td class="id">A07</td><td class="name">Responsiveness · grids</td><td><span class="status significant">Significant</span></td><td>Only 9 <code>md:</code> and 7 <code>lg:</code> breakpoint hits across the entire tree — app is desktop-only by default.</td><td class="vol">md: 9 · lg: 7 · sm: 0 · xl: 0</td></tr>
-      <tr><td class="id">A08</td><td class="name">Accessibility</td><td><span class="status major">Major</span></td><td>0 aria-label, 0 aria-describedby, 0 role= across the whole tree. 3 aria-hidden. 1 sr-only. No reduced-motion gate.</td><td class="vol">aria-label files: 0 / 33 · aria-describedby: 0 · role=: 0 · sr-only: 1 · prefers-reduced-motion: 0</td></tr>
-      <tr><td class="id">A09</td><td class="name">Motion</td><td><span class="status significant">Significant</span></td><td>2 animate-spin (raw inline SVG spinners), 9 animate-pulse sites (6 outside Skeleton). No motion gate.</td><td class="vol">animate-spin: 2 · animate-pulse (outside Skeleton): 6 · motion gate: 0</td></tr>
-      <tr><td class="id">A10</td><td class="name">Forms</td><td><span class="status minor">Minor</span></td><td><code>SearchableSelect</code>, <code>MultiSelectFilter</code>, <code>PeriodSelector</code> primitives exist; raw <code>&lt;input&gt;</code> still appears in QueryExplorer.</td><td class="vol">SearchableSelect: 1 · MultiSelectFilter: 1 · raw inputs: ~6</td></tr>
-      <tr><td class="id">A11</td><td class="name">Data display</td><td><span class="status ok">OK</span></td><td>10 files use <code>tabular-nums</code> — strong adoption for a 33-file app. ScoreCard + TrendChart + Pagination all use it.</td><td class="vol">tabular-nums files: 10 / 33</td></tr>
-      <tr><td class="id">A12</td><td class="name">Dark / theme mode</td><td><span class="status major">Major</span></td><td>Zero <code>dark:</code> classes across 178 <code>bg-*</code> surface declarations. App is light-mode-only by design or by omission.</td><td class="vol">total bg-*: 178 · dark:bg-*: 0 · light-only: 178 (100%)</td></tr>
-      <tr><td class="id">A13</td><td class="name">Hygiene</td><td><span class="status ok">OK</span></td><td>Zero <code>as any</code>, zero TODO, zero FIXME, zero console.log/warn residue. Cleanest hygiene of the three audited projects.</td><td class="vol">as any: 0 · TODO: 0 · console.log/warn: 0</td></tr>
-      <tr><td class="id">A14</td><td class="name">Responsiveness · tables</td><td><span class="status significant">Significant</span></td><td>8 files render tables; 3 wrap in <code>overflow-x</code>. Alerts, Intelligence, Issues, QuestionTypes tables overflow on narrow viewports.</td><td class="vol">tables: 8 files · overflow-x: 3 · column-hiding: minimal</td></tr>
+      <tr><td class="id">A01</td><td class="name">Primitives</td><td><span class="status significant">Significant</span></td><td><code>Skeleton.tsx</code> exports <code>Skeleton</code>, <code>SkeletonCard</code>, <code>SkeletonTable</code>, <code>SkeletonDashboard</code> — only <strong>1 caller</strong> (Dashboard.tsx). 6 files render <code>animate-pulse</code> ad-hoc instead. <code>Section</code> is duplicated 3× verbatim across pages.</td><td class="vol">Skeleton: 1 caller · 4 exports · ad-hoc animate-pulse outside it: 6 · Section duplicates: 3</td></tr>
+      <tr><td class="id">A02</td><td class="name">Library convention</td><td><span class="status minor">Minor</span></td><td><code>StatusBadge.tsx</code> has a 10-key tone lookup (<code>success</code>/<code>error</code>/<code>open</code>/<code>in_progress</code>/<code>resolved</code>/<code>pending</code>/<code>verified</code>/<code>critical</code>/<code>warning</code>/<code>info</code>) — clean. <code>Pagination</code>, <code>ScoreCard</code> have no variant API.</td><td class="vol">StatusBadge: 10-key map, 6 callers</td></tr>
+      <tr><td class="id">A03</td><td class="name">Application convention</td><td><span class="status minor">Minor</span></td><td><code>PageHeader</code> (70-line sticky primitive with <code>filters</code>+<code>actions</code> slots) is well-designed and used by <strong>7</strong> pages. <code>useQueryFilters</code> at <code>hooks/useQueryFilters.ts</code> used by <strong>6</strong> pages. Alerts.tsx + Issues.tsx are the only bypasses.</td><td class="vol">PageHeader callers: 7 · useQueryFilters callers: 6 · bypass pages: 2 (Alerts, Issues)</td></tr>
+      <tr><td class="id">A04</td><td class="name">Color tokens</td><td><span class="status significant">Significant</span></td><td>10 files use <code>gray-*</code> (82 hits). <code>KpiCard.tsx:32-36</code> and <code>TrendChart.tsx:24,32</code> hard-code <strong>Tailwind 500/600 hex values</strong> (<code>#64748B</code>, <code>#059669</code>, <code>#DC2626</code>, <code>#4F46E5</code>) instead of using token classes — smoking-gun #4 (inlined copies of canonical constants).</td><td class="vol">gray-* files: 10 · gray-* hits: 82 · zinc creep: 2 pages · raw Tailwind hex: 8 sites</td></tr>
+      <tr><td class="id">A05</td><td class="name">Typography</td><td><span class="status significant">Significant</span></td><td><strong>20+ distinct eyebrow className recipes</strong> — same intent, 4 sizes (<code>text-[10px]</code> / <code>text-[11px]</code> / <code>text-xs</code> / <code>text-sm</code>), 2 weights, 4 colors. Alerts + Issues use <code>text-2xl font-bold text-gray-900</code> for h1 (bypassing PageHeader).</td><td class="vol">eyebrow variants: 20+ · h1-recipes outside PageHeader: 1 (text-2xl text-gray-900)</td></tr>
+      <tr><td class="id">A06</td><td class="name">Radii</td><td><span class="status minor">Minor</span></td><td>Scale uses <code>md</code> (46) + <code>lg</code> (45) + <code>xl</code> (36) + bare <code>rounded</code> (200). PageHeader / Dashboard <code>Section</code> use <code>rounded-xl</code>; QueryExplorer <code>Section</code> doesn't — primitive-shape inconsistency.</td><td class="vol">md 46 · lg 45 · xl 36 · full 31 · bare 200</td></tr>
+      <tr><td class="id">A07</td><td class="name">Responsiveness · grids</td><td><span class="status significant">Significant</span></td><td>9 <code>md:</code> hits and 7 <code>lg:</code> across 33 files; <strong>0</strong> <code>sm:</code>, 0 <code>xl:</code>. <code>Dashboard</code>'s 4-column KPI grid stays 4-up to viewport zero.</td><td class="vol">md: 9 · lg: 7 · sm: 0 · xl: 0</td></tr>
+      <tr><td class="id">A08</td><td class="name">Accessibility</td><td><span class="status major">Major</span></td><td><strong>0 files</strong> use <code>aria-label</code>, 0 use <code>aria-describedby</code>, 0 use <code>role=</code>. <code>Pagination.tsx</code> chevron buttons + <code>SearchableSelect.tsx</code> dismiss + <code>MultiSelectFilter</code> clear are all unlabeled.</td><td class="vol">aria-label: 0 / 33 · aria-describedby: 0 · role=: 0 · sr-only: 1 · prefers-reduced-motion: 0</td></tr>
+      <tr><td class="id">A09</td><td class="name">Motion</td><td><span class="status significant">Significant</span></td><td>2 raw inline-SVG spinners at <code>QueryExplorer.tsx:318</code> and <code>Evaluations.tsx:310, 1222</code> bypass any <code>Spinner</code> primitive (none exists). 6 ad-hoc <code>animate-pulse</code> sites outside <code>Skeleton</code>. No motion gate.</td><td class="vol">animate-spin (inline SVG): 3 sites · animate-pulse outside Skeleton: 6 · motion gate: 0</td></tr>
+      <tr><td class="id">A10</td><td class="name">Forms</td><td><span class="status significant">Significant</span></td><td>Two <code>alert()</code> calls with the <strong>same literal string</strong> "Export failed. Check the backend logs." — at <code>QueryExplorer.tsx:212</code> and <code>Evaluations.tsx:660</code>. Smoking-gun #6: native-dialog bypass of a (here, not-yet-built) custom toast / modal.</td><td class="vol">alert() sites: 2 · same literal message · no Toast primitive</td></tr>
+      <tr><td class="id">A11</td><td class="name">Data display</td><td><span class="status ok">OK</span></td><td>10 of 33 files use <code>tabular-nums</code> — strong adoption for a small app. <code>ScoreCard</code>, <code>TrendChart</code>, <code>Pagination</code>, <code>KpiCard</code> all use it.</td><td class="vol">tabular-nums files: 10 / 33</td></tr>
+      <tr><td class="id">A12</td><td class="name">Dark / theme mode</td><td><span class="status major">Major</span></td><td>Zero <code>dark:</code> classes across 178 <code>bg-*</code> surface declarations. <code>tailwind.config</code> has no <code>darkMode</code> setting. App is light-mode-only by design or by omission.</td><td class="vol">total bg-*: 178 · dark:bg-*: 0 · light-only: 178 (100%)</td></tr>
+      <tr><td class="id">A13</td><td class="name">Hygiene</td><td><span class="status ok">OK</span></td><td>Zero <code>as any</code>, zero <code>@ts-ignore</code>, zero TODO/FIXME, zero <code>console.log</code>/<code>console.warn</code> residue. Cleanest hygiene of the three audited projects.</td><td class="vol">as any: 0 · TODO/FIXME: 0 · console.log/warn: 0</td></tr>
+      <tr><td class="id">A14</td><td class="name">Responsiveness · tables</td><td><span class="status significant">Significant</span></td><td>8 files render tables; 3 wrap in <code>overflow-x</code>. <code>Alerts</code>, <code>Intelligence</code>, <code>Issues</code>, <code>QuestionTypes</code> use <code>&lt;table&gt;</code> without <code>&lt;Pagination&gt;</code> import — pages can grow past the visible viewport with no scroll affordance.</td><td class="vol">tables: 8 · overflow-x wrappers: 3 · &lt;table&gt; without Pagination import: 4</td></tr>
     </tbody>
   </table>
 
-  <h2 class="section-title">Section 1 · Axes in detail <span class="sub">evidence + BEFORE / AFTER for each non-OK axis</span></h2>
+  <h2 class="section-title">Section 1 · Axes in detail <span class="sub">named-component findings + BEFORE / AFTER per non-OK axis</span></h2>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A01</span>
+      <span class="axis-name">Primitives — Skeleton defined-but-mostly-unused; Section duplicated 3×</span>
+      <span class="status significant">Significant</span>
+      <span class="scope">Skeleton.tsx · Dashboard.tsx · QueryExplorer.tsx · Organizations.tsx</span>
+    </div>
+    <div class="finding">
+      <div class="lead">Named finding · 2 smoking guns</div>
+      <div class="body">
+        <strong>(1)</strong> <code>src/components/Skeleton.tsx</code> exports four primitives (<code>Skeleton</code>, <code>SkeletonCard</code>, <code>SkeletonTable</code>, <code>SkeletonDashboard</code>) — but <code>grep -rln "from.*Skeleton"</code> returns <strong>only Dashboard.tsx</strong>. 6 other files render <code>animate-pulse</code> blocks ad-hoc (QueryExplorer:388/664, QuestionTypes:90-91, Organizations:472, Evaluations:438/1475).
+        <br/><br/>
+        <strong>(2)</strong> A <code>Section</code> component is declared <strong>3 times verbatim</strong> across pages, each with subtly different shape:
+        <ul style="margin:6px 0 0;padding-left:18px;font-family:var(--mono);font-size:11.5px;">
+          <li><code>pages/Dashboard.tsx:17</code> — full props (title, action, loading, className), <code>rounded-xl bg-white shadow-sm</code></li>
+          <li><code>pages/QueryExplorer.tsx:688</code> — minimal (title, action), no card chrome, uses eyebrow-style title</li>
+          <li><code>pages/Organizations.tsx:461</code> — minimal (title only), eyebrow-style title, no action slot</li>
+        </ul>
+      </div>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · QueryExplorer.tsx:388 hand-rolls animate-pulse</div>
+        <div class="demo">
+          <div style="border:1px solid #E2E8F0;background:#fff;border-radius:6px;padding:8px;">
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+              <div style="height:14px;background:#E2E8F0;border-radius:4px;animation:pulse 1.4s ease-in-out infinite;"></div>
+              <div style="height:14px;background:#E2E8F0;border-radius:4px;animation:pulse 1.4s ease-in-out infinite;"></div>
+              <div style="height:14px;background:#E2E8F0;border-radius:4px;animation:pulse 1.4s ease-in-out infinite;"></div>
+              <div style="height:14px;background:#E2E8F0;border-radius:4px;animation:pulse 1.4s ease-in-out infinite;"></div>
+              <div style="height:14px;background:#E2E8F0;border-radius:4px;animation:pulse 1.4s ease-in-out infinite;"></div>
+            </div>
+          </div>
+          <style>@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }</style>
+        </div>
+<div class="code"><span class="cmt">// pages/QueryExplorer.tsx:386-389</span>
+&lt;<span class="raw">tr</span> key={i} className="border-b border-zinc-50"&gt;
+  &lt;<span class="raw">td</span> key={j} className="p-4"&gt;
+    &lt;<span class="raw">div</span> className=<span class="raw">"animate-pulse bg-zinc-200 h-4 rounded"</span> /&gt;
+  &lt;/<span class="raw">td</span>&gt;</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · use SkeletonTable (already defined!)</div>
+        <div class="demo">
+          <div style="border:1px solid #E2E8F0;background:#fff;border-radius:8px;padding:8px;">
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+              <div style="height:14px;background:#E2E8F0;border-radius:4px;animation:pulse 1.4s ease-in-out infinite;"></div>
+              <div style="height:14px;background:#E2E8F0;border-radius:4px;animation:pulse 1.4s ease-in-out infinite;"></div>
+              <div style="height:14px;background:#E2E8F0;border-radius:4px;animation:pulse 1.4s ease-in-out infinite;"></div>
+              <div style="height:14px;background:#E2E8F0;border-radius:4px;animation:pulse 1.4s ease-in-out infinite;"></div>
+              <div style="height:14px;background:#E2E8F0;border-radius:4px;animation:pulse 1.4s ease-in-out infinite;"></div>
+            </div>
+          </div>
+        </div>
+<div class="code"><span class="cmt">// pages/QueryExplorer.tsx — the primitive already exists!</span>
+<span class="raw">import</span> { <span class="tok">SkeletonTable</span> } <span class="raw">from</span> <span class="tok">"@/components/Skeleton"</span>;
+
+{loading ? &lt;<span class="tok">SkeletonTable</span> rows={8} cols={5} /&gt; : &lt;<span class="tok">QueryTable</span> …/&gt;}</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ Skeleton adoption rises from 1 → 7 callers · Section primitive promoted to <code>components/Section.tsx</code> (−2 inline copies)</div>
+  </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A04</span>
-      <span class="axis-name">Color tokens — gray vs slate drift</span>
+      <span class="axis-name">Color tokens — KpiCard.tsx ships an inline 5-color palette</span>
       <span class="status significant">Significant</span>
-      <span class="scope">src/pages/Alerts.tsx · src/pages/Issues.tsx · src/components/*</span>
+      <span class="scope">KpiCard.tsx · TrendChart.tsx · 10 gray-* files</span>
+    </div>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body"><code>src/components/KpiCard.tsx:32-36</code> hand-codes the Tailwind 500/600 hex values for chart accents:
+        <pre style="margin:6px 0 0;font-family:var(--mono);font-size:11px;background:rgba(0,0,0,0.04);padding:8px;border-radius:6px;">slate:   '#64748B'   // = slate-500
+emerald: '#059669'   // = emerald-600
+red:     '#DC2626'   // = red-600
+amber:   '#D97706'   // = amber-600
+indigo:  '#4F46E5'   // = indigo-600</pre>
+        These are bytes-for-bytes copies of the canonical tokens. The day Tailwind upgrades or the team adds a brand override, this palette silently drifts. <code>TrendChart.tsx:24, 32, 72-76</code> repeats the pattern with chart axis/gradient hex.
+      </div>
     </div>
     <div class="evidence">
-      <div class="lbl">Pattern</div>
+      <div class="lbl">gray-* concentration (top files)</div>
       <ul>
-        <li>Toolkit-aligned codebases use <code>slate-*</code> for neutrals; <code>gray-*</code> is the Tailwind default.</li>
-        <li>Per-file gray-* counts (top 5):</li>
-        <li class="citation">  25 — src/pages/Alerts.tsx</li>
-        <li class="citation">  15 — src/pages/Issues.tsx</li>
-        <li class="citation">  12 — src/pages/QueryExplorer.tsx</li>
-        <li class="citation">  10 — src/components/SearchableSelect.tsx</li>
-        <li class="citation">   7 — src/components/Pagination.tsx</li>
-        <li>Zinc creep in pages: QueryExplorer.tsx:386, Evaluations.tsx:438 (skeleton row tds).</li>
+        <li class="citation">25 — pages/Alerts.tsx (most: <code>text-gray-500</code> + <code>border-gray-200</code>)</li>
+        <li class="citation">15 — pages/Issues.tsx</li>
+        <li class="citation">12 — pages/QueryExplorer.tsx</li>
+        <li class="citation">10 — components/SearchableSelect.tsx</li>
+        <li class="citation"> 7 — components/Pagination.tsx</li>
+        <li>Zinc creep in pages: QueryExplorer.tsx:386 (<code>border-zinc-50</code>), QueryExplorer.tsx:388 + Evaluations.tsx:438 (<code>bg-zinc-200</code>)</li>
       </ul>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · gray-* across pagination + filters</div>
+        <div class="tag"><span class="dot"></span>Before · KpiCard.tsx:32-36 inline palette</div>
         <div class="demo">
-          <div style="display:flex;gap:6px;align-items:center;font-size:11.5px;color:#6B7280;">
-            <button style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid #E5E7EB;background:#fff;color:#4B5563;">‹</button>
-            <span style="color:#6B7280;">Page 1 of 12</span>
-            <button style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid #E5E7EB;background:#fff;color:#4B5563;">›</button>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <span style="display:inline-block;width:14px;height:14px;background:#64748B;border-radius:3px;"></span>
+            <span style="display:inline-block;width:14px;height:14px;background:#059669;border-radius:3px;"></span>
+            <span style="display:inline-block;width:14px;height:14px;background:#DC2626;border-radius:3px;"></span>
+            <span style="display:inline-block;width:14px;height:14px;background:#D97706;border-radius:3px;"></span>
+            <span style="display:inline-block;width:14px;height:14px;background:#4F46E5;border-radius:3px;"></span>
           </div>
         </div>
-<div class="code"><span class="cmt">// Pagination.tsx · L16-52</span>
-&lt;<span class="raw">span</span> className=<span class="raw">"text-gray-500"</span>&gt;No matching rows&lt;/<span class="raw">span</span>&gt;
-&lt;<span class="raw">button</span> className=<span class="raw">"border-gray-200 hover:bg-gray-50"</span>&gt;…&lt;/<span class="raw">button</span>&gt;</div>
+<div class="code"><span class="cmt">// src/components/KpiCard.tsx · L32-36</span>
+<span class="raw">const</span> <span class="tok">accentSpark</span>: Record&lt;AccentColor, string&gt; = {
+  slate:   <span class="raw">'#64748B'</span>,
+  emerald: <span class="raw">'#059669'</span>,
+  red:     <span class="raw">'#DC2626'</span>,
+  amber:   <span class="raw">'#D97706'</span>,
+  indigo:  <span class="raw">'#4F46E5'</span>,
+};</div>
       </div>
       <div class="a">
-        <div class="tag"><span class="dot"></span>After · slate-* canonical</div>
+        <div class="tag"><span class="dot"></span>After · resolve from Tailwind config</div>
         <div class="demo">
-          <div style="display:flex;gap:6px;align-items:center;font-size:11.5px;color:#64748B;">
-            <button style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid #E2E8F0;background:#fff;color:#475569;">‹</button>
-            <span style="color:#64748B;">Page 1 of 12</span>
-            <button style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid #E2E8F0;background:#fff;color:#475569;">›</button>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <span style="display:inline-block;width:14px;height:14px;background:#64748B;border-radius:3px;"></span>
+            <span style="display:inline-block;width:14px;height:14px;background:#059669;border-radius:3px;"></span>
+            <span style="display:inline-block;width:14px;height:14px;background:#DC2626;border-radius:3px;"></span>
+            <span style="display:inline-block;width:14px;height:14px;background:#D97706;border-radius:3px;"></span>
+            <span style="display:inline-block;width:14px;height:14px;background:#4F46E5;border-radius:3px;"></span>
           </div>
         </div>
-<div class="code">&lt;<span class="tok">span</span> className=<span class="tok">"text-slate-500"</span>&gt;No matching rows&lt;/<span class="tok">span</span>&gt;
-&lt;<span class="tok">button</span> className=<span class="tok">"border-slate-200 hover:bg-slate-50"</span>&gt;…&lt;/<span class="tok">button</span>&gt;</div>
+<div class="code"><span class="cmt">// src/lib/tokens.ts (NEW — single source of truth)</span>
+<span class="raw">import</span> resolveConfig <span class="raw">from</span> <span class="tok">'tailwindcss/resolveConfig'</span>;
+<span class="raw">import</span> tw <span class="raw">from</span> <span class="tok">'../../tailwind.config'</span>;
+<span class="raw">export const</span> <span class="tok">tokens</span> = resolveConfig(tw).theme!.colors!;
+
+<span class="cmt">// src/components/KpiCard.tsx</span>
+<span class="raw">const</span> <span class="tok">accentSpark</span>: Record&lt;AccentColor, string&gt; = {
+  slate:   tokens.slate[<span class="tok">500</span>],
+  emerald: tokens.emerald[<span class="tok">600</span>],
+  …
+};</div>
       </div>
     </div>
-    <div class="delta-row">Δ −82 gray-* hits across 10 files → +0 primitives (mechanical codemod)</div>
+    <div class="delta-row">Δ −5 hex literals in KpiCard · −6 in TrendChart · single source of truth resolves Tailwind drift automatically</div>
   </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A05</span>
-      <span class="axis-name">Typography — eyebrow label drift</span>
+      <span class="axis-name">Typography — 20+ eyebrow recipes</span>
       <span class="status significant">Significant</span>
-      <span class="scope">src/pages/* · src/components/*</span>
+      <span class="scope">across pages/ + components/</span>
+    </div>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body">The "uppercase tracking-wider label" appears with at least 20 distinct className strings — different sizes (<code>text-[10px]</code> / <code>text-[11px]</code> / <code>text-xs</code> / <code>text-sm</code>), weights (<code>font-medium</code> / <code>font-semibold</code>), colors (<code>text-slate-400</code> / <code>text-slate-500</code> / <code>text-amber-700</code> / <code>text-red-600</code> / <code>text-white</code>), and margin conventions (<code>mb-0.5</code> / <code>mb-1</code> / <code>mb-1.5</code> / <code>mb-2</code> / <code>mt-0.5</code> / <code>mt-1</code> / <code>mt-1.5</code>). No <code>&lt;Eyebrow&gt;</code> primitive exists.</div>
     </div>
     <div class="evidence">
-      <div class="lbl">Pattern</div>
+      <div class="lbl">Sample variants (from grep — 20+ unique class strings)</div>
       <ul>
-        <li>20+ distinct className recipes for "uppercase eyebrow label" — sample selection:</li>
-        <li class="citation">  <code>text-[10px] font-semibold text-slate-500 uppercase tracking-wider</code></li>
-        <li class="citation">  <code>text-xs font-semibold uppercase tracking-wider</code></li>
-        <li class="citation">  <code>text-[11px] uppercase tracking-wider text-slate-500</code></li>
-        <li class="citation">  <code>block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-0.5</code></li>
-        <li class="citation">  <code>text-[10px] font-medium text-slate-400 uppercase tracking-wider</code></li>
-        <li>Same intent, 4–5 different sizes, 2 different tracking, 3 different colors.</li>
+        <li class="citation"><code>text-[10px] font-semibold text-slate-500 uppercase tracking-wider</code></li>
+        <li class="citation"><code>text-xs font-semibold uppercase tracking-wider</code></li>
+        <li class="citation"><code>text-[11px] uppercase tracking-wider text-slate-500</code></li>
+        <li class="citation"><code>block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-0.5</code></li>
+        <li class="citation"><code>text-[10px] font-medium text-slate-400 uppercase tracking-wider</code></li>
+        <li class="citation"><code>text-[11px] font-semibold text-amber-700 uppercase tracking-wider mb-1.5</code></li>
+        <li class="citation"><code>text-[11px] font-semibold text-red-600 uppercase tracking-wider mb-1</code></li>
+        <li class="citation"><code>text-sm font-medium text-muted-foreground uppercase tracking-wider</code></li>
       </ul>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · five eyebrows, five classNames</div>
-        <div class="demo">
-          <div style="font-size:10px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">Question type</div>
-          <div style="font-size:11px;font-weight:500;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;">Org</div>
+        <div class="tag"><span class="dot"></span>Before · 4 sites, 4 different recipes</div>
+        <div class="demo" style="display:flex;flex-direction:column;gap:4px;">
+          <div style="font-size:10px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">Section title</div>
+          <div style="font-size:11px;font-weight:500;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;">Org name</div>
           <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Status</div>
+          <div style="font-size:11px;font-weight:600;color:#B45309;text-transform:uppercase;letter-spacing:0.06em;">Severity: amber variant</div>
         </div>
-<div class="code">&lt;<span class="raw">label</span> className=<span class="raw">"text-[10px] font-semibold tracking-wider …"</span>&gt;Question type&lt;/<span class="raw">label</span>&gt;
-&lt;<span class="raw">label</span> className=<span class="raw">"text-[11px] uppercase tracking-wider …"</span>&gt;Org&lt;/<span class="raw">label</span>&gt;
-&lt;<span class="raw">label</span> className=<span class="raw">"text-xs font-semibold uppercase tracking-wider"</span>&gt;Status&lt;/<span class="raw">label</span>&gt;</div>
+<div class="code"><span class="cmt">// scattered across pages/* and components/*</span>
+&lt;<span class="raw">label</span> className=<span class="raw">"text-[10px] font-semibold text-slate-500 …"</span>&gt;Section title&lt;/<span class="raw">label</span>&gt;
+&lt;<span class="raw">label</span> className=<span class="raw">"text-[11px] uppercase tracking-wider …"</span>&gt;Org name&lt;/<span class="raw">label</span>&gt;
+&lt;<span class="raw">label</span> className=<span class="raw">"text-xs font-semibold uppercase …"</span>&gt;Status&lt;/<span class="raw">label</span>&gt;
+&lt;<span class="raw">label</span> className=<span class="raw">"text-[11px] font-semibold text-amber-700 …"</span>&gt;Severity&lt;/<span class="raw">label</span>&gt;</div>
       </div>
       <div class="a">
-        <div class="tag"><span class="dot"></span>After · one Eyebrow primitive</div>
-        <div class="demo">
-          <div style="font-size:10px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">Question type</div>
-          <div style="font-size:10px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">Org</div>
+        <div class="tag"><span class="dot"></span>After · &lt;Eyebrow&gt; primitive (1 canonical recipe)</div>
+        <div class="demo" style="display:flex;flex-direction:column;gap:4px;">
+          <div style="font-size:10px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">Section title</div>
+          <div style="font-size:10px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">Org name</div>
           <div style="font-size:10px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">Status</div>
+          <div style="font-size:10px;font-weight:600;color:#B45309;text-transform:uppercase;letter-spacing:0.06em;">Severity</div>
         </div>
-<div class="code">&lt;<span class="tok">Eyebrow</span>&gt;Question type&lt;/<span class="tok">Eyebrow</span>&gt;
-&lt;<span class="tok">Eyebrow</span>&gt;Org&lt;/<span class="tok">Eyebrow</span>&gt;
+<div class="code"><span class="cmt">// components/Eyebrow.tsx (NEW)</span>
+&lt;<span class="tok">Eyebrow</span>&gt;Section title&lt;/<span class="tok">Eyebrow</span>&gt;
+&lt;<span class="tok">Eyebrow</span>&gt;Org name&lt;/<span class="tok">Eyebrow</span>&gt;
 &lt;<span class="tok">Eyebrow</span>&gt;Status&lt;/<span class="tok">Eyebrow</span>&gt;
+&lt;<span class="tok">Eyebrow</span> tone=<span class="tok">"warning"</span>&gt;Severity&lt;/<span class="tok">Eyebrow</span>&gt;
 <span class="cmt">// canonical: text-[10px] font-semibold text-slate-500 uppercase tracking-wider</span></div>
       </div>
     </div>
-    <div class="delta-row">Δ −~20 className recipes → 1 <code>&lt;Eyebrow&gt;</code> primitive</div>
+    <div class="delta-row">Δ ~20 className recipes → 1 primitive (+ <code>tone</code> variant for amber/red exception)</div>
   </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A07</span>
-      <span class="axis-name">Responsiveness · grids</span>
+      <span class="axis-name">Responsiveness · grids — 0 sm: breakpoints in 33 files</span>
       <span class="status significant">Significant</span>
-      <span class="scope">src/pages/* · 33 files</span>
+      <span class="scope">whole tree</span>
     </div>
-    <div class="evidence">
-      <div class="lbl">Pattern</div>
-      <ul>
-        <li>Across the whole tree: 9 <code>md:</code> hits, 7 <code>lg:</code> hits. Zero <code>sm:</code>, zero <code>xl:</code>.</li>
-        <li>Effectively a desktop-only application — mobile layout is not handled.</li>
-        <li>The KPI grids on Dashboard / Organizations / Evaluations don't reflow under ~900px.</li>
-      </ul>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body">Across the entire 33-file tree, only <strong>9</strong> uses of <code>md:</code> and <strong>7</strong> uses of <code>lg:</code> — and <strong>0</strong> uses of <code>sm:</code> or <code>xl:</code>. The KPI grids on Dashboard, Organizations, Evaluations are written as <code>grid-cols-4</code> with no responsive variants — they stay 4-up below 600px, which makes the cards 90px wide and unreadable on phones. If the product is "desktop-only by intent" this is fine; if it should reflow it's a bigger lift.</div>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · 4-column grid, no breakpoints</div>
+        <div class="tag"><span class="dot"></span>Before · grid-cols-4, fixed</div>
         <div class="demo">
           <div style="display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:6px;">
             <div style="background:#fff;border:1px solid #E2E8F0;border-radius:6px;padding:8px;font-size:10px;">Score</div>
@@ -296,7 +399,7 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
           </div>
         </div>
 <div class="code">&lt;<span class="raw">div</span> className=<span class="raw">"grid grid-cols-4 gap-4"</span>&gt;
-  &lt;<span class="tok">ScoreCard</span> … /&gt;
+  &lt;<span class="tok">KpiCard</span> … /&gt;
   …
 &lt;/<span class="raw">div</span>&gt;</div>
       </div>
@@ -311,198 +414,261 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
           </div>
         </div>
 <div class="code">&lt;<span class="tok">div</span> className=<span class="tok">"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"</span>&gt;
-  &lt;<span class="tok">ScoreCard</span> … /&gt;
+  &lt;<span class="tok">KpiCard</span> … /&gt;
 &lt;/<span class="tok">div</span>&gt;</div>
       </div>
     </div>
-    <div class="delta-row">Δ +mobile-first responsive scaffold on KPI grids (Dashboard, Organizations, Evaluations)</div>
+    <div class="delta-row">Δ +mobile-first responsive scaffold on Dashboard, Organizations, Evaluations KPI grids</div>
   </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A08</span>
-      <span class="axis-name">Accessibility</span>
+      <span class="axis-name">Accessibility — 0 aria-label files across the tree</span>
       <span class="status major">Major</span>
-      <span class="scope">src/ · 33 files</span>
+      <span class="scope">33 files · all icon-only controls silent to AT</span>
     </div>
-    <div class="evidence">
-      <div class="lbl">Pattern</div>
-      <ul>
-        <li>aria-label: <strong>0</strong> files · aria-describedby: <strong>0</strong> · role=: <strong>0</strong> · sr-only: <strong>1</strong> · prefers-reduced-motion: <strong>0</strong>.</li>
-        <li>Icon-only paginator buttons (‹ / ›), filter dismiss buttons, sort arrows — all unlabeled.</li>
-        <li>This is the lowest assistive-tech coverage of the three audited projects.</li>
-      </ul>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body"><code>grep -rln "aria-label" src/</code> returns <strong>0 files</strong>. Same for <code>aria-describedby</code> and <code>role=</code>. The four canonical icon-only controls — <code>Pagination.tsx</code> chevrons (L31-58), <code>SearchableSelect.tsx</code> dismiss/dropdown (L55+), <code>MultiSelectFilter</code> clear button, <code>SortHeader.tsx</code> sort arrows — are all unlabeled. Screen readers announce them as "button" with no context.</div>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · paginator + filter buttons silent to AT</div>
+        <div class="tag"><span class="dot"></span>Before · Pagination.tsx chevrons</div>
         <div class="demo">
-          <div style="display:flex;gap:6px;align-items:center;font-size:11.5px;">
-            <button style="padding:4px 9px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;">‹</button>
-            <button style="padding:4px 9px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;">›</button>
-            <button style="padding:4px 9px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;color:#94A3B8;">×</button>
+          <div style="display:flex;gap:6px;align-items:center;font-size:11.5px;color:#64748B;">
+            <button style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid #E5E7EB;background:#fff;color:#4B5563;">‹</button>
+            <span style="color:#6B7280;">Page 1 of 12</span>
+            <button style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid #E5E7EB;background:#fff;color:#4B5563;">›</button>
           </div>
         </div>
-<div class="code">&lt;<span class="raw">button</span> onClick={prev}&gt;‹&lt;/<span class="raw">button</span>&gt;
-&lt;<span class="raw">button</span> onClick={next}&gt;›&lt;/<span class="raw">button</span>&gt;
-&lt;<span class="raw">button</span> onClick={clear}&gt;×&lt;/<span class="raw">button</span>&gt;</div>
+<div class="code"><span class="cmt">// components/Pagination.tsx · L31-58</span>
+&lt;<span class="raw">button</span> onClick={onFirst} disabled={page === 1}&gt;«&lt;/<span class="raw">button</span>&gt;
+&lt;<span class="raw">button</span> onClick={onPrev}  disabled={page === 1}&gt;‹&lt;/<span class="raw">button</span>&gt;
+&lt;<span class="raw">button</span> onClick={onNext}  disabled={page === total}&gt;›&lt;/<span class="raw">button</span>&gt;
+&lt;<span class="raw">button</span> onClick={onLast}  disabled={page === total}&gt;»&lt;/<span class="raw">button</span>&gt;</div>
       </div>
       <div class="a">
-        <div class="tag"><span class="dot"></span>After · labels + role</div>
+        <div class="tag"><span class="dot"></span>After · labels + nav role</div>
         <div class="demo">
-          <div style="display:flex;gap:6px;align-items:center;font-size:11.5px;">
+          <div style="display:flex;gap:6px;align-items:center;font-size:11.5px;color:#64748B;">
             <button style="padding:4px 9px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;">‹</button>
+            <span>Page 1 of 12</span>
             <button style="padding:4px 9px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;">›</button>
-            <button style="padding:4px 9px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;color:#64748B;">×</button>
           </div>
         </div>
-<div class="code">&lt;<span class="tok">button</span> onClick={prev} aria-label=<span class="tok">"Previous page"</span>&gt;‹&lt;/<span class="tok">button</span>&gt;
-&lt;<span class="tok">button</span> onClick={next} aria-label=<span class="tok">"Next page"</span>&gt;›&lt;/<span class="tok">button</span>&gt;
-&lt;<span class="tok">button</span> onClick={clear} aria-label=<span class="tok">"Clear filter"</span>&gt;×&lt;/<span class="tok">button</span>&gt;</div>
+<div class="code">&lt;<span class="tok">nav</span> aria-label=<span class="tok">"Pagination"</span>&gt;
+  &lt;<span class="tok">button</span> onClick={onFirst} aria-label=<span class="tok">"First page"</span>&gt;«&lt;/<span class="tok">button</span>&gt;
+  &lt;<span class="tok">button</span> onClick={onPrev}  aria-label=<span class="tok">"Previous page"</span>&gt;‹&lt;/<span class="tok">button</span>&gt;
+  &lt;<span class="tok">button</span> onClick={onNext}  aria-label=<span class="tok">"Next page"</span>&gt;›&lt;/<span class="tok">button</span>&gt;
+  &lt;<span class="tok">button</span> onClick={onLast}  aria-label=<span class="tok">"Last page"</span>&gt;»&lt;/<span class="tok">button</span>&gt;
+&lt;/<span class="tok">nav</span>&gt;</div>
       </div>
     </div>
-    <div class="delta-row">Δ +~25 aria-label on icon-only controls · +sr-only label on the live alert count · +motion-reduce gate on Skeleton</div>
+    <div class="delta-row">Δ +~25 aria-label additions on icon-only controls · +nav role on Pagination · +motion-reduce gate on Skeleton/Spinner</div>
   </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A09</span>
-      <span class="axis-name">Motion</span>
+      <span class="axis-name">Motion — 3 raw inline-SVG spinners, no Spinner primitive</span>
       <span class="status significant">Significant</span>
-      <span class="scope">QueryExplorer.tsx · Evaluations.tsx · Skeleton.tsx</span>
+      <span class="scope">QueryExplorer.tsx:318 · Evaluations.tsx:310, 1222</span>
     </div>
-    <div class="evidence">
-      <div class="lbl">Pattern</div>
-      <ul>
-        <li>2 raw inline-SVG spinners (animate-spin) on QueryExplorer + Evaluations toolbar buttons.</li>
-        <li>6 animate-pulse uses outside the canonical Skeleton primitive.</li>
-        <li>No <code>prefers-reduced-motion</code> gate anywhere — every animation runs unconditionally.</li>
-      </ul>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body">Three identical inline-SVG spinner blocks (~12 lines each) live at <code>QueryExplorer.tsx:318</code>, <code>Evaluations.tsx:310</code>, and <code>Evaluations.tsx:1222</code> — same SVG path, same <code>w-3.5 h-3.5 animate-spin</code> classes, no shared primitive. No <code>Spinner</code> component exists in <code>components/</code>. Adding one would delete ~36 lines of duplicated markup.</div>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · inline SVG spinner + ad-hoc pulse blocks</div>
+        <div class="tag"><span class="dot"></span>Before · 3 copies of the same inline SVG</div>
         <div class="demo">
           <div style="display:flex;align-items:center;gap:8px;">
-            <span class="pm-spinner"></span><span style="font-size:11.5px;">Running…</span>
+            <span style="display:inline-block;width:14px;height:14px;border:2px solid #E2E8F0;border-top-color:#0F172A;border-radius:99px;animation:spin 1s linear infinite;"></span>
+            <span style="font-size:11.5px;">Running query…</span>
           </div>
-          <div style="margin-top:10px;height:14px;background:#E5E7EB;border-radius:4px;width:60%;animation:pulse 1.4s ease-in-out infinite;"></div>
-          <style>@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }</style>
+          <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
         </div>
-<div class="code">&lt;<span class="raw">svg</span> className=<span class="raw">"animate-spin w-3.5 h-3.5"</span>&gt;…&lt;/<span class="raw">svg</span>&gt;
-&lt;<span class="raw">div</span> className=<span class="raw">"animate-pulse bg-zinc-200 h-4 rounded"</span> /&gt;</div>
+<div class="code"><span class="cmt">// QueryExplorer.tsx:318, Evaluations.tsx:310 & 1222 — all 3 identical</span>
+&lt;<span class="raw">svg</span> className=<span class="raw">"w-3.5 h-3.5 animate-spin"</span> fill=<span class="raw">"none"</span> stroke=<span class="raw">"currentColor"</span> viewBox=<span class="raw">"0 0 24 24"</span>&gt;
+  &lt;<span class="raw">circle</span> cx="12" cy="12" r="10" stroke=<span class="raw">"currentColor"</span> strokeWidth="4" opacity="0.25" /&gt;
+  &lt;<span class="raw">path</span> fill=<span class="raw">"currentColor"</span> d=<span class="raw">"M4 12a8 8 0 018-8v4..."</span> /&gt;
+&lt;/<span class="raw">svg</span>&gt;</div>
       </div>
       <div class="a">
-        <div class="tag"><span class="dot"></span>After · Spinner primitive + Skeleton</div>
+        <div class="tag"><span class="dot"></span>After · Spinner primitive + motion gate</div>
         <div class="demo">
           <div style="display:flex;align-items:center;gap:8px;">
-            <span class="pm-spinner"></span><span style="font-size:11.5px;">Running…</span>
+            <span style="display:inline-block;width:14px;height:14px;border:2px solid #E2E8F0;border-top-color:#0F172A;border-radius:99px;animation:spin 1s linear infinite;"></span>
+            <span style="font-size:11.5px;">Running query…</span>
           </div>
-          <div style="margin-top:10px;height:14px;background:#E2E8F0;border-radius:6px;width:60%;animation:pulse 1.4s ease-in-out infinite;"></div>
         </div>
-<div class="code">&lt;<span class="tok">Spinner</span> size=<span class="tok">"sm"</span> /&gt; Running…
-&lt;<span class="tok">Skeleton</span> className=<span class="tok">"h-4 w-3/5"</span> /&gt;
-<span class="cmt">// both honour prefers-reduced-motion internally</span></div>
+<div class="code"><span class="cmt">// components/Spinner.tsx (NEW)</span>
+<span class="raw">export function</span> <span class="tok">Spinner</span>({ size = <span class="tok">'sm'</span> }: { size?: <span class="tok">'sm'</span> | <span class="tok">'md'</span> }) {
+  <span class="raw">const</span> reduceMotion = useReducedMotion();
+  <span class="raw">return</span> &lt;<span class="tok">svg</span> className={clsx(size === <span class="tok">'sm'</span> &amp;&amp; <span class="tok">'w-3.5 h-3.5'</span>,
+                            !reduceMotion &amp;&amp; <span class="tok">'animate-spin'</span>)} …/&gt;;
+}
+
+<span class="cmt">// 3 call sites collapse to:</span>
+&lt;<span class="tok">Spinner</span> size="sm" /&gt; Running query…</div>
       </div>
     </div>
-    <div class="delta-row">Δ −2 inline-svg spinners → +1 Spinner primitive · −6 ad-hoc pulse blocks → Skeleton</div>
+    <div class="delta-row">Δ −36 lines of duplicated SVG · +1 Spinner primitive · +useReducedMotion hook · 6 ad-hoc animate-pulse → Skeleton (covered in A01)</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A10</span>
+      <span class="axis-name">Forms — two alert() calls with identical literal</span>
+      <span class="status significant">Significant</span>
+      <span class="scope">QueryExplorer.tsx:212 · Evaluations.tsx:660</span>
+    </div>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body">Both export-failure paths fall back to <code>alert('Export failed. Check the backend logs.')</code> — character-for-character identical. Smoking-gun #6: native-browser-dialog bypass of a custom modal. No Toast / SnackBar / ConfirmModal primitive exists in <code>components/</code> yet, so the export-failure UX is a stark OS alert. Fix is two-step: (1) build a <code>Toast</code> primitive; (2) replace the 2 <code>alert()</code> sites.</div>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · native OS alert</div>
+        <div class="demo" style="display:flex;justify-content:center;align-items:center;min-height:140px;background:#F1F5F9;">
+          <div class="native-alert">
+            <div class="msg">Export failed. Check the backend logs.</div>
+            <div class="row">
+              <button class="btn primary">OK</button>
+            </div>
+          </div>
+        </div>
+<div class="code"><span class="cmt">// QueryExplorer.tsx:208-214 + Evaluations.tsx:655-661 — same shape</span>
+} <span class="raw">catch</span> (e) {
+  console.error(e);
+  <span class="raw">alert</span>(<span class="raw">'Export failed. Check the backend logs.'</span>);
+} <span class="raw">finally</span> {
+  setExporting(<span class="raw">false</span>);
+}</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · Toast primitive</div>
+        <div class="demo" style="display:flex;justify-content:center;align-items:center;min-height:140px;">
+          <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 14px;display:flex;gap:10px;align-items:center;font-size:12.5px;max-width:380px;">
+            <span style="color:#B91C1C;font-weight:600;">⚠</span>
+            <div>
+              <div style="font-weight:600;color:#B91C1C;">Export failed</div>
+              <div style="color:#7F1D1D;font-size:11.5px;margin-top:1px;">Check the backend logs · <a style="color:#4338CA;text-decoration:underline;">view request</a></div>
+            </div>
+          </div>
+        </div>
+<div class="code"><span class="cmt">// components/Toast.tsx (NEW) + hook</span>
+} <span class="raw">catch</span> (e) {
+  console.error(e);
+  <span class="tok">toast</span>.error(<span class="tok">'Export failed'</span>, {
+    description: <span class="tok">'Check the backend logs.'</span>,
+    action: { label: <span class="tok">'View request'</span>, onClick: () =&gt; setDebugOpen(true) },
+  });
+}</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ +1 Toast primitive · −2 native alert() calls · +1 affordance (View request) for debugging the failure</div>
   </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A12</span>
-      <span class="axis-name">Dark / theme mode</span>
+      <span class="axis-name">Dark / theme mode — 0 dark: classes across 178 surfaces</span>
       <span class="status major">Major</span>
-      <span class="scope">100% light-only — 178 / 178 bg-* declarations</span>
+      <span class="scope">100% light-only · tailwind.config has no darkMode</span>
     </div>
-    <div class="evidence">
-      <div class="lbl">Pattern</div>
-      <ul>
-        <li>Total <code>bg-*-NNN</code> classes: 178 · with paired <code>dark:bg-*</code>: <strong>0</strong>.</li>
-        <li>No theme switcher anywhere; tailwind.config has no <code>darkMode</code> setting.</li>
-        <li>If dark mode is in scope, this is a from-scratch addition (not a partial-coverage fix).</li>
-      </ul>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body">Total <code>bg-*-NNN</code> classes: 178 · with paired <code>dark:bg-*</code>: <strong>0</strong>. <code>tailwind.config.js</code> doesn't declare <code>darkMode: 'class'</code> or <code>'media'</code>. No theme toggle, no theme provider, no CSS variable palette. If dark mode is in scope it's a from-scratch addition, not a partial-coverage fix.</div>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · no dark mode (any surface)</div>
+        <div class="tag"><span class="dot"></span>Before · ScoreCard light-only</div>
         <div class="demo">
-          <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:10px;">
-            <div style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;">Quality score</div>
-            <div style="font-size:18px;font-weight:700;font-family:var(--mono);">87.4</div>
+          <div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:12px;display:inline-block;text-align:center;">
+            <div style="font-size:24px;font-weight:700;font-family:var(--mono);font-variant-numeric:tabular-nums;">87.4</div>
+            <div style="font-size:11px;color:#64748B;margin-top:2px;">Quality score</div>
           </div>
         </div>
-<div class="code">&lt;<span class="raw">div</span> className=<span class="raw">"bg-white border-slate-200 rounded-lg"</span>&gt;
-  &lt;<span class="raw">span</span> className=<span class="raw">"text-slate-500"</span>&gt;Quality score&lt;/<span class="raw">span</span>&gt;
+<div class="code"><span class="cmt">// components/ScoreCard.tsx — no dark: pairs</span>
+&lt;<span class="raw">div</span> className=<span class="raw">"bg-white rounded-lg shadow-sm border border-gray-100 p-5 text-center"</span>&gt;
+  &lt;<span class="raw">div</span> className=<span class="raw">"text-2xl font-bold tabular-nums"</span>&gt;{value}&lt;/<span class="raw">div</span>&gt;
+  &lt;<span class="raw">div</span> className=<span class="raw">"text-sm text-gray-500 mt-1"</span>&gt;{label}&lt;/<span class="raw">div</span>&gt;
 &lt;/<span class="raw">div</span>&gt;</div>
       </div>
       <div class="a">
         <div class="tag"><span class="dot"></span>After · dark: pair on every surface</div>
         <div class="demo">
-          <div style="background:#0F172A;border:1px solid #1E293B;border-radius:8px;padding:10px;">
-            <div style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;">Quality score</div>
-            <div style="font-size:18px;font-weight:700;color:#F1F5F9;font-family:var(--mono);">87.4</div>
+          <div style="background:#0F172A;border:1px solid #1E293B;border-radius:10px;padding:12px;display:inline-block;text-align:center;">
+            <div style="font-size:24px;font-weight:700;color:#F1F5F9;font-family:var(--mono);font-variant-numeric:tabular-nums;">87.4</div>
+            <div style="font-size:11px;color:#94A3B8;margin-top:2px;">Quality score</div>
           </div>
         </div>
-<div class="code">&lt;<span class="tok">div</span> className=<span class="tok">"bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-lg"</span>&gt;
-  &lt;<span class="tok">span</span> className=<span class="tok">"text-slate-500 dark:text-slate-400"</span>&gt;Quality score&lt;/<span class="tok">span</span>&gt;
+<div class="code"><span class="cmt">// tailwind.config.js</span>
+darkMode: <span class="tok">'class'</span>,
+
+<span class="cmt">// ScoreCard.tsx</span>
+&lt;<span class="tok">div</span> className=<span class="tok">"bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-lg …"</span>&gt;
+  &lt;<span class="tok">div</span> className=<span class="tok">"text-slate-900 dark:text-slate-100"</span>&gt;{value}&lt;/<span class="tok">div</span>&gt;
+  &lt;<span class="tok">div</span> className=<span class="tok">"text-slate-500 dark:text-slate-400"</span>&gt;{label}&lt;/<span class="tok">div</span>&gt;
 &lt;/<span class="tok">div</span>&gt;</div>
       </div>
     </div>
-    <div class="delta-row">Δ +178 dark: pair additions (or: extract surface tokens behind <code>bg-surface</code> / <code>text-muted</code> primitives)</div>
+    <div class="delta-row">Δ +darkMode in tailwind config · +178 dark: pair additions (or extract surface tokens behind primitives first)</div>
   </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A14</span>
-      <span class="axis-name">Responsiveness · tables</span>
+      <span class="axis-name">Responsiveness · tables — 4 pages with tables but no Pagination import</span>
       <span class="status significant">Significant</span>
-      <span class="scope">8 table files · 3 wrap in overflow-x</span>
+      <span class="scope">Alerts · Intelligence · Issues · QuestionTypes</span>
     </div>
-    <div class="evidence">
-      <div class="lbl">Pattern</div>
-      <ul>
-        <li>Files with <code>&lt;table&gt;</code>: 8 · with <code>overflow-x</code>: 3.</li>
-        <li>Pages with tables and no Pagination import: Alerts, Intelligence, Issues, QuestionTypes.</li>
-        <li>No column-hiding strategy — no <code>md:hidden</code> / <code>sm:table-cell</code> hits.</li>
-      </ul>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body">8 files render <code>&lt;table&gt;</code>; only 3 wrap in <code>overflow-x</code>. <strong>4 named pages have tables but don't import <code>&lt;Pagination&gt;</code></strong>: Alerts.tsx, Intelligence.tsx, Issues.tsx, QuestionTypes.tsx. Combined with zero <code>md:hidden</code> / <code>sm:table-cell</code> column-hide usage in the tree, narrow viewports either truncate or render with horizontal scroll.</div>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · table renders past viewport</div>
+        <div class="tag"><span class="dot"></span>Before · Alerts.tsx table no wrapper</div>
         <div class="demo">
           <div style="border:1px solid #E5E7EB;border-radius:6px;background:#fff;overflow:hidden;">
-            <div style="display:grid;grid-template-columns:0.7fr 1.4fr 1fr 0.9fr 0.7fr;gap:6px;padding:6px 10px;font-size:10px;background:#F9FAFB;color:#6B7280;text-transform:uppercase;letter-spacing:0.04em;">
-              <div>ID</div><div>Query</div><div>Org</div><div>Q-type</div><div>Score</div>
+            <div style="display:grid;grid-template-columns:0.7fr 1.4fr 1fr 0.9fr 0.7fr;gap:6px;padding:6px 10px;font-size:10px;color:#6B7280;background:#F9FAFB;text-transform:uppercase;letter-spacing:0.04em;">
+              <div>ID</div><div>Monitor</div><div>Org</div><div>Severity</div><div>Status</div>
             </div>
-            <div style="display:grid;grid-template-columns:0.7fr 1.4fr 1fr 0.9fr 0.7fr;gap:6px;padding:6px 10px;font-size:11.5px;">
-              <div>#1421</div><div>show me cardinality drift</div><div>Acme</div><div>ad-hoc</div><div>92</div>
+            <div style="display:grid;grid-template-columns:0.7fr 1.4fr 1fr 0.9fr 0.7fr;gap:6px;padding:6px 10px;font-size:11px;">
+              <div>#1421</div><div>Mixpanel sync lag &gt; 30m</div><div>Acme Co</div><div><span class="pm-chip error">critical</span></div><div><span class="pm-chip warning">in_progress</span></div>
             </div>
           </div>
         </div>
-<div class="code">&lt;<span class="raw">table</span> className="w-full"&gt; <span class="cmt">/* no wrapper */</span>
+<div class="code"><span class="cmt">// pages/Alerts.tsx — no overflow wrapper, no Pagination</span>
+&lt;<span class="raw">table</span> className="w-full"&gt;
+  &lt;<span class="raw">thead</span>&gt;…&lt;/<span class="raw">thead</span>&gt;
+  &lt;<span class="raw">tbody</span>&gt;…&lt;/<span class="raw">tbody</span>&gt;
 &lt;/<span class="raw">table</span>&gt;</div>
       </div>
       <div class="a">
-        <div class="tag"><span class="dot"></span>After · overflow + responsive column-hide</div>
+        <div class="tag"><span class="dot"></span>After · overflow + column-hide + Pagination</div>
         <div class="demo">
           <div style="border:1px solid #E2E8F0;border-radius:8px;background:#fff;overflow:hidden;">
-            <div style="display:grid;grid-template-columns:0.7fr 1.4fr 1fr 0.7fr;gap:6px;padding:6px 10px;font-size:10px;background:#F1F5F9;color:#475569;text-transform:uppercase;letter-spacing:0.04em;">
-              <div>ID</div><div>Query</div><div>Org</div><div>Score</div>
+            <div style="display:grid;grid-template-columns:0.7fr 1.4fr 0.9fr 0.7fr;gap:6px;padding:6px 10px;font-size:10px;background:#F1F5F9;color:#475569;text-transform:uppercase;letter-spacing:0.04em;">
+              <div>ID</div><div>Monitor</div><div>Severity</div><div>Status</div>
             </div>
-            <div style="display:grid;grid-template-columns:0.7fr 1.4fr 1fr 0.7fr;gap:6px;padding:6px 10px;font-size:11.5px;">
-              <div>#1421</div><div>show me cardinality drift</div><div>Acme</div><div>92</div>
+            <div style="display:grid;grid-template-columns:0.7fr 1.4fr 0.9fr 0.7fr;gap:6px;padding:6px 10px;font-size:11px;">
+              <div>#1421</div><div>Mixpanel sync lag &gt; 30m</div><div><span class="pm-chip error">critical</span></div><div><span class="pm-chip warning">in_progress</span></div>
             </div>
           </div>
         </div>
 <div class="code">&lt;<span class="tok">div</span> className=<span class="tok">"overflow-x-auto"</span>&gt;
   &lt;<span class="tok">table</span>&gt;
-    &lt;<span class="tok">th</span> className=<span class="tok">"hidden md:table-cell"</span>&gt;Q-type&lt;/<span class="tok">th</span>&gt;
+    &lt;<span class="tok">th</span> className=<span class="tok">"hidden md:table-cell"</span>&gt;Org&lt;/<span class="tok">th</span>&gt;
   &lt;/<span class="tok">table</span>&gt;
-&lt;/<span class="tok">div</span>&gt;</div>
+&lt;/<span class="tok">div</span>&gt;
+&lt;<span class="tok">Pagination</span> page={page} total={total} … /&gt;</div>
       </div>
     </div>
-    <div class="delta-row">Δ +5 overflow-x wrappers · column-hide on Q-type / Last touch / Latency on md</div>
+    <div class="delta-row">Δ +4 Pagination imports · +5 overflow-x wrappers · column-hide pattern established</div>
   </div>
 
   <div class="axis-card ok-card">
@@ -510,46 +676,48 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
       <span class="num">A11</span>
       <span class="axis-name">Data display · A13 Hygiene</span>
       <span class="status ok">OK · 2 axes</span>
-      <span class="scope">strong baseline</span>
+      <span class="scope">strong baselines</span>
     </div>
     <div class="single">
-      <strong>Data display (A11):</strong> 10 of 33 files use <code>tabular-nums</code> — strong adoption for a small app. ScoreCard, TrendChart, Pagination all align numerics correctly. Shared fmt helpers in <code>src/lib/format.ts</code>.
+      <strong>A11 — Data display:</strong> 10 of 33 files use <code>tabular-nums</code> — strong adoption (~30%) for a small app. <code>ScoreCard</code>, <code>TrendChart</code>, <code>Pagination</code>, <code>KpiCard</code> all align numerics correctly. Shared <code>fmt*</code> helpers in components rather than per-file copies.
       <br/><br/>
-      <strong>Hygiene (A13):</strong> Zero <code>as any</code>, zero TODO, zero FIXME, zero console residue. Cleanest hygiene of the three audited projects — a credit to whoever set up the lint rules.
+      <strong>A13 — Hygiene:</strong> Zero <code>as any</code>, zero <code>@ts-ignore</code>, zero TODO/FIXME, zero <code>console.log</code>/<code>console.warn</code> residue across the whole 33-file tree. Cleanest of the three audited projects — credit to whoever set up the lint config.
     </div>
   </div>
 
   <div class="axis-card ok-card">
     <div class="head">
-      <span class="num">A01</span>
-      <span class="axis-name">Primitives · A02 Library convention · A03 App convention · A06 Radii · A10 Forms</span>
-      <span class="status minor">Minor · 5 axes</span>
+      <span class="num">A02</span>
+      <span class="axis-name">Library convention · A03 App convention · A06 Radii</span>
+      <span class="status minor">Minor · 3 axes</span>
       <span class="scope">batch</span>
     </div>
     <div class="single">
-      Five axes land at Minor. <strong>A01</strong>: small components/ dir with strong primitives (<code>StatusBadge</code>, <code>ScoreCard</code>, <code>Pagination</code>); only inline <code>Section</code> duplicated 3 times. <strong>A02</strong>: <code>StatusBadge</code>'s tone-keyed lookup is the closest thing to a variant API — works well. <strong>A03</strong>: PageHeader + useQueryFilters exist and adopted on 7 of 9 pages; only Alerts + Issues bypass. <strong>A06</strong>: radii spread is reasonable. <strong>A10</strong>: filter primitives (<code>SearchableSelect</code>, <code>MultiSelectFilter</code>, <code>PeriodSelector</code>) are solid; raw <code>&lt;input&gt;</code> on QueryExplorer toolbar is the holdout.
+      <strong>A02 — Library convention:</strong> <code>StatusBadge.tsx</code> has a 10-key tone map (success/error/open/in_progress/resolved/pending/verified/critical/warning/info) used by 6 callers — works well as a non-enum lookup pattern.
+      <br/><br/>
+      <strong>A03 — App convention:</strong> <code>PageHeader</code> (substantial 70-line sticky primitive at <code>components/filters/PageHeader.tsx</code>) is well-designed and used by 7 of 9 pages. <code>useQueryFilters</code> hook used by 6 pages. Alerts.tsx + Issues.tsx are the only bypasses (and they share the same <code>text-2xl font-bold text-gray-900</code> recipe — single PR to migrate).
+      <br/><br/>
+      <strong>A06 — Radii:</strong> Scale uses md / lg / xl + bare <code>rounded</code> — distribution is fine. The primitive-shape inconsistency (Dashboard <code>Section</code> uses <code>rounded-xl</code>, QueryExplorer <code>Section</code> doesn't) resolves when Section is promoted to a shared primitive (A01).
     </div>
   </div>
 
-  <h2 class="section-title">Section 2 · Page in context <span class="sub">src/pages/Alerts.tsx — drift-density leader (25 gray-* hits + h1 bypass + 0 dark + no aria)</span></h2>
+  <h2 class="section-title">Section 2 · Page in context <span class="sub">Alerts.tsx — drift-density leader (PageHeader bypass + gray-* + no aria + no dark + no overflow)</span></h2>
   <div class="context-wrap">
     <div class="context-pair">
       <div class="frame bad">
-        <div class="frame-tag"><span style="display:inline-block;width:8px;height:8px;border-radius:99px;background:currentColor;"></span> Before <span class="meta">A03 + A04 + A08 + A12 + A14 visible</span></div>
+        <div class="frame-tag"><span style="display:inline-block;width:8px;height:8px;border-radius:99px;background:currentColor;"></span> Before <span class="meta">A03 + A04 + A05 + A08 + A12 + A14 visible</span></div>
         <div class="page-mock">
-          <div class="row-with-note"><span class="note bad">A03 — bypasses PageHeader</span><span class="note bad">A05 — inline h1 className</span></div>
+          <div class="row-with-note"><span class="note bad">A03 — bypasses PageHeader (the primitive exists!)</span><span class="note bad">A05 — text-2xl font-bold</span></div>
           <h1 class="pm-h1 drift">Alerts</h1>
-          <p class="pm-sub" style="color:#6B7280;">Active monitors and recent firings.</p>
-          <div class="row-with-note"><span class="note bad">A04 — gray-500 text + gray-200 borders</span></div>
-          <div class="pm-toolbar">
-            <button class="pm-btn" style="border-color:#E5E7EB;color:#4B5563;">All severities</button>
-            <button class="pm-btn" style="border-color:#E5E7EB;color:#4B5563;">All orgs</button>
-            <button class="pm-btn" style="border-color:#E5E7EB;color:#4B5563;">Last 7d</button>
-            <button class="pm-btn" style="margin-left:auto;border-color:#E5E7EB;color:#4B5563;">Export CSV</button>
+          <p class="pm-sub" style="color:#6B7280;">Alert rules and notification history</p>
+          <div class="row-with-note"><span class="note bad">A04 — gray-500 text + gray-200 borders + gray-100 tab background</span></div>
+          <div style="display:flex;background:#F3F4F6;border-radius:8px;padding:3px;width:fit-content;font-size:11.5px;font-weight:500;margin-bottom:14px;">
+            <div style="padding:4px 12px;border-radius:6px;background:#fff;color:#111827;box-shadow:0 1px 1px rgba(0,0,0,0.04);">Rules (8)</div>
+            <div style="padding:4px 12px;color:#6B7280;">History (43)</div>
           </div>
-          <div class="row-with-note"><span class="note bad">A14 — table, no overflow wrapper</span><span class="note bad">A08 — no aria on row actions</span></div>
+          <div class="row-with-note"><span class="note bad">A14 — &lt;table&gt; without overflow-x or Pagination</span><span class="note bad">A08 — no aria-label on rows</span></div>
           <div class="pm-table">
-            <div class="pm-table-row head" style="background:#F9FAFB;color:#6B7280;"><div>ID</div><div>Monitor</div><div>Org</div><div>Severity</div><div>Status</div></div>
+            <div class="pm-table-row head" style="background:#F9FAFB;color:#6B7280;"><div>ID</div><div>Rule</div><div>Org</div><div>Severity</div><div>Status</div></div>
             <div class="pm-table-row" style="color:#374151;"><div>#1421</div><div>Mixpanel sync lag &gt; 30m</div><div>Acme Co</div><div><span class="pm-chip error">critical</span></div><div><span class="pm-chip warning">in_progress</span></div></div>
             <div class="pm-table-row" style="color:#374151;"><div>#1418</div><div>Schema cardinality drift</div><div>Kwontified</div><div><span class="pm-chip warning">warning</span></div><div><span class="pm-chip info">pending</span></div></div>
             <div class="pm-table-row" style="color:#374151;"><div>#1411</div><div>Backfill row delta</div><div>Northwind</div><div><span class="pm-chip warning">warning</span></div><div><span class="pm-chip success">resolved</span></div></div>
@@ -558,22 +726,20 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
         </div>
       </div>
       <div class="frame good">
-        <div class="frame-tag"><span style="display:inline-block;width:8px;height:8px;border-radius:99px;background:currentColor;"></span> After <span class="meta">A03 + A04 + A08 + A12 + A14 resolved</span></div>
+        <div class="frame-tag"><span style="display:inline-block;width:8px;height:8px;border-radius:99px;background:currentColor;"></span> After <span class="meta">A03 + A04 + A05 + A08 + A12 + A14 resolved</span></div>
         <div class="page-mock">
-          <div class="row-with-note"><span class="note good">A03 + A05 — PageHeader primitive</span></div>
+          <div class="row-with-note"><span class="note good">A03 + A05 — &lt;PageHeader&gt; primitive adopted</span></div>
           <h1 class="pm-h1 fixed">Alerts</h1>
-          <p class="pm-sub">Active monitors and recent firings.</p>
+          <p class="pm-sub">Alert rules and notification history</p>
           <div style="height:1px;background:#E2E8F0;margin:6px 0 12px;"></div>
           <div class="row-with-note"><span class="note good">A04 — slate-* canonical</span></div>
-          <div class="pm-toolbar">
-            <button class="pm-btn">All severities</button>
-            <button class="pm-btn">All orgs</button>
-            <button class="pm-btn">Last 7d</button>
-            <button class="pm-btn primary" style="margin-left:auto;">Export CSV</button>
+          <div style="display:flex;background:#F1F5F9;border-radius:8px;padding:3px;width:fit-content;font-size:11.5px;font-weight:500;margin-bottom:14px;">
+            <div style="padding:4px 12px;border-radius:6px;background:#fff;color:#0F172A;box-shadow:0 1px 1px rgba(0,0,0,0.04);">Rules (8)</div>
+            <div style="padding:4px 12px;color:#64748B;">History (43)</div>
           </div>
-          <div class="row-with-note"><span class="note good">A14 — overflow-x wrapper</span><span class="note good">A08 — aria-label on row actions</span></div>
+          <div class="row-with-note"><span class="note good">A14 — overflow-x + Pagination · A08 — aria-label on row actions</span></div>
           <div class="pm-table fixed">
-            <div class="pm-table-row head fixed"><div>ID</div><div>Monitor</div><div>Org</div><div>Severity</div><div>Status</div></div>
+            <div class="pm-table-row head fixed"><div>ID</div><div>Rule</div><div>Org</div><div>Severity</div><div>Status</div></div>
             <div class="pm-table-row"><div>#1421</div><div>Mixpanel sync lag &gt; 30m</div><div>Acme Co</div><div><span class="pm-chip error">critical</span></div><div><span class="pm-chip warning">in_progress</span></div></div>
             <div class="pm-table-row"><div>#1418</div><div>Schema cardinality drift</div><div>Kwontified</div><div><span class="pm-chip warning">warning</span></div><div><span class="pm-chip info">pending</span></div></div>
             <div class="pm-table-row"><div>#1411</div><div>Backfill row delta</div><div>Northwind</div><div><span class="pm-chip warning">warning</span></div><div><span class="pm-chip success">resolved</span></div></div>
@@ -583,6 +749,19 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
       </div>
     </div>
   </div>
+
+  <h2 class="section-title">Step 7 · suggested execution order</h2>
+  <ol style="font-size:13px;line-height:1.7;padding-left:22px;">
+    <li><strong>Promote <code>Section</code> to a shared primitive</strong> (A01). 3 inline copies converge to <code>components/Section.tsx</code> with optional <code>action</code> + <code>loading</code> slots.</li>
+    <li><strong>Replace 6 ad-hoc <code>animate-pulse</code> blocks with <code>SkeletonTable</code> / <code>SkeletonCard</code></strong> (A01, A09) — the primitives already exist and just aren't being used.</li>
+    <li><strong>Build <code>Spinner</code> + <code>Toast</code> primitives</strong> (A09, A10). Spinner deletes 36 lines of duplicated inline-SVG; Toast replaces the 2 <code>alert()</code> calls with named-pretty failure UX.</li>
+    <li><strong>aria-label sweep on icon-only controls</strong> (A08) — Pagination, SearchableSelect, MultiSelectFilter, SortHeader.</li>
+    <li><strong>Centralise the inline hex palette</strong> (A04) — resolve from <code>tailwind.config</code> via <code>resolveConfig</code> in <code>lib/tokens.ts</code>; <code>KpiCard.tsx</code> + <code>TrendChart.tsx</code> import from it.</li>
+    <li><strong>Migrate Alerts.tsx + Issues.tsx onto PageHeader</strong> (A03, A05). Single PR; both pages share the same bypass shape.</li>
+    <li><strong>Build <code>Eyebrow</code> primitive + codemod</strong> (A05) — sweep 20+ uppercase tracking-wider recipes onto one component.</li>
+    <li><strong>Mobile reflow on KPI grids</strong> (A07) — <code>grid-cols-1 sm:grid-cols-2 lg:grid-cols-4</code>.</li>
+    <li><strong>Dark mode</strong> (A12) — only worth doing if it's a product goal; otherwise leave Major as a documented design decision.</li>
+  </ol>
 
   <div class="footer-note">
     <div>Audit produced by the <a href="https://github.com/sumedh-png/style-drift">style-drift</a> Claude Code skill. Read-only — no source files were modified.</div>

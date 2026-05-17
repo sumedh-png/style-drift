@@ -17,7 +17,7 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
-body { font-family: var(--sans); background: var(--doc-bg); color: var(--doc-fg); -webkit-font-smoothing: antialiased; }
+body { font-family: var(--sans); background: var(--doc-bg); color: var(--doc-fg); -webkit-font-smoothing: antialiased; line-height: 1.5; }
 .doc { max-width: 1320px; margin: 0 auto; padding: 32px 24px 64px; }
 .doc-head { margin-bottom: 22px; border-bottom: 1px solid var(--doc-border); padding-bottom: 18px; }
 .doc-head h1 { margin: 0 0 6px; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
@@ -26,7 +26,6 @@ body { font-family: var(--sans); background: var(--doc-bg); color: var(--doc-fg)
 .pill.path { background: #EEF2FF; color: #4338CA; font-family: var(--mono); font-weight: 500; }
 .pill.recon { background: #0F172A; color: #F1F5F9; font-weight: 600; }
 .pill.recon b { color: #94A3B8; font-weight: 400; margin-right: 4px; }
-.pill.recon span { color: #F1F5F9; }
 .recon-row { margin-top: 10px; line-height: 2; }
 .kpi-row { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
 .kpi { background: #fff; border: 1px solid var(--doc-border); border-radius: 8px; padding: 8px 12px; font-size: 12px; display: flex; flex-direction: column; gap: 2px; min-width: 130px; }
@@ -60,6 +59,11 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
 .axis-card .head .num { font-family: var(--mono); font-weight: 700; color: var(--doc-fg-dim); font-size: 12px; }
 .axis-card .head .axis-name { font-size: 14px; font-weight: 700; }
 .axis-card .head .scope { font-family: var(--mono); font-size: 11px; color: var(--doc-fg-dim); margin-left: auto; }
+.axis-card .finding { margin-top: 10px; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 10px 12px; font-size: 12.5px; }
+.axis-card .finding.major-finding { background: #FEF2F2; border-color: #FECACA; }
+.axis-card .finding .lead { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #92400E; font-weight: 700; margin-bottom: 4px; }
+.axis-card .finding.major-finding .lead { color: #B91C1C; }
+.axis-card .finding .body code { font-family: var(--mono); background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 3px; font-size: 11.5px; }
 .axis-card .evidence { margin-top: 12px; background: #FAFBFC; border: 1px solid var(--doc-border); border-radius: 8px; padding: 10px 12px; font-size: 12px; }
 .axis-card .evidence .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--doc-fg-dim); font-weight: 700; }
 .axis-card .evidence ul { margin: 6px 0 0; padding-left: 18px; }
@@ -78,10 +82,8 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
 .axis-card .code .tok { color: #86EFAC; }
 .axis-card .code .cmt { color: #64748B; font-style: italic; }
 .axis-card .delta-row { margin-top: 10px; font-size: 11px; font-family: var(--mono); color: var(--good); font-weight: 600; }
-.axis-card.ok-card .single { margin-top: 10px; padding: 12px 14px; background: var(--good-bg); border: 1px solid var(--good-border); border-radius: 8px; font-size: 12px; color: #14532D; line-height: 1.5; }
-.axis-card.na-card .single { margin-top: 10px; padding: 12px 14px; background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 12px; color: #475569; line-height: 1.5; }
-
-/* Section 2 — page in context */
+.axis-card.ok-card .single { margin-top: 10px; padding: 12px 14px; background: var(--good-bg); border: 1px solid var(--good-border); border-radius: 8px; font-size: 12px; color: #14532D; line-height: 1.55; }
+.axis-card.na-card .single { margin-top: 10px; padding: 12px 14px; background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 12px; color: #475569; line-height: 1.55; }
 .context-wrap { background: #fff; border: 1px solid var(--doc-border); border-radius: 12px; padding: 16px; margin-top: 16px; }
 .context-pair { display: grid; grid-template-columns: 1fr; gap: 14px; }
 @media (min-width: 1200px) { .context-pair { grid-template-columns: 1fr 1fr; } }
@@ -95,9 +97,7 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
 .note { font-size: 10px; font-family: var(--mono); padding: 1px 7px; border-radius: 4px; letter-spacing: 0.02em; display: inline-block; }
 .note.bad  { background: var(--bad-bg);  color: #B91C1C; border: 1px solid var(--bad-border); }
 .note.good { background: var(--good-bg); color: #15803D; border: 1px solid var(--good-border); }
-/* Page mock primitives */
 .pm-h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
-.pm-h1.drift { font-weight: 700; }
 .pm-h1.fixed { font-weight: 600; }
 .pm-sub { font-size: 12px; color: var(--doc-fg-dim); margin: 4px 0 14px; }
 .pm-toolbar { display: flex; gap: 8px; margin: 8px 0 12px; flex-wrap: wrap; }
@@ -112,18 +112,17 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
 .pm-card .pm-card-d { font-size: 11px; color: var(--doc-fg-dim); margin-top: 4px; }
 .pm-table { background: #fff; border: 1px solid var(--doc-border); border-radius: 8px; overflow: hidden; }
 .pm-table.fixed { border-radius: 10px; }
-.pm-table-row { display: grid; grid-template-columns: 1.4fr 1fr 0.7fr 0.7fr 1fr; gap: 8px; padding: 8px 12px; font-size: 11.5px; border-bottom: 1px solid var(--doc-border); align-items: center; }
+.pm-table-row { display: grid; grid-template-columns: 1.4fr 1fr 0.7fr 0.9fr 1fr; gap: 8px; padding: 8px 12px; font-size: 11.5px; border-bottom: 1px solid var(--doc-border); align-items: center; }
 .pm-table-row:last-child { border-bottom: none; }
 .pm-table-row.head { background: #FAFBFC; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--doc-fg-dim); font-weight: 700; }
 .pm-chip { font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 4px; display: inline-block; }
 .pm-chip.in-prog { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
 .pm-chip.complete { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
 .pm-chip.warning { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
+.pm-chip.violet { background: #F5F3FF; color: #6D28D9; border: 1px solid #DDD6FE; }
 .pm-chip.canonical { background: #EEF2FF; color: #3730A3; border: 1px solid #C7D2FE; font-family: var(--mono); }
 .pm-spinner { display: inline-block; width: 11px; height: 11px; border: 2px solid #CBD5E1; border-top-color: #0F172A; border-radius: 99px; animation: spin 1s linear infinite; margin-right: 6px; vertical-align: middle; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.pm-strip { height: 2px; width: 100%; background: linear-gradient(90deg, transparent, #0F172A, transparent); background-size: 200% 100%; animation: strip 1.4s linear infinite; }
-@keyframes strip { 0% { background-position: -100% 0; } 100% { background-position: 100% 0; } }
 .footer-note { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--doc-border); font-size: 12px; color: var(--doc-fg-dim); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
 .footer-note code { font-family: var(--mono); background: #EEF2FF; color: #4338CA; padding: 1px 6px; border-radius: 4px; }
 </style>
@@ -135,18 +134,18 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
     <div class="sub">
       <span class="pill path">/Users/sumedh/Documents/commerce-customer-intelligence-system</span>
       <div class="recon-row">
-        <span class="pill recon"><b>stack</b><span>web</span></span>
-        <span class="pill recon"><b>framework</b><span>next.js</span></span>
-        <span class="pill recon"><b>styling</b><span>tailwind</span></span>
-        <span class="pill recon"><b>tokens</b><span>tailwind-config + theme-object</span></span>
-        <span class="pill recon"><b>primitives</b><span>radix + custom-ui-dir</span></span>
-        <span class="pill recon"><b>tree</b><span>standard-tree</span></span>
-        <span class="pill recon"><b>files</b><span>245</span></span>
+        <span class="pill recon"><b>stack</b>web</span>
+        <span class="pill recon"><b>framework</b>next.js</span>
+        <span class="pill recon"><b>styling</b>tailwind</span>
+        <span class="pill recon"><b>tokens</b>tailwind-config + theme-object</span>
+        <span class="pill recon"><b>primitives</b>radix + custom-ui-dir (17 files)</span>
+        <span class="pill recon"><b>tree</b>standard-tree</span>
+        <span class="pill recon"><b>files</b>245</span>
       </div>
     </div>
     <div class="kpi-row">
-      <div class="kpi major"><div class="label">Major</div><div class="val">1</div></div>
-      <div class="kpi sig"><div class="label">Significant</div><div class="val">6</div></div>
+      <div class="kpi major"><div class="label">Major</div><div class="val">2</div></div>
+      <div class="kpi sig"><div class="label">Significant</div><div class="val">5</div></div>
       <div class="kpi min"><div class="label">Minor</div><div class="val">5</div></div>
       <div class="kpi ok"><div class="label">OK / OK · N/A</div><div class="val">2</div></div>
     </div>
@@ -157,343 +156,489 @@ h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 1
     <span class="item fixed"><span class="dot"></span>Resolved in AFTER</span>
   </div>
 
-  <h2 class="section-title">Axis catalog <span class="sub">14 rows · status + headline finding + supporting volume</span></h2>
+  <h2 class="section-title">Axis catalog <span class="sub">14 rows · status + named-component finding + supporting volume</span></h2>
   <table class="catalog">
     <thead>
       <tr><th>#</th><th>Axis</th><th>Status</th><th>Headline finding</th><th>Volume</th></tr>
     </thead>
     <tbody>
-      <tr><td class="id">A01</td><td class="name">Primitives</td><td><span class="status minor">Minor</span></td><td>Radix + custom-ui-dir is the spine. Adoption strong but a handful of pages still roll raw <code>&lt;button&gt;</code> chrome.</td><td class="vol">components/ui/* present · Skeleton, Badge, Card all used</td></tr>
-      <tr><td class="id">A02</td><td class="name">Library convention</td><td><span class="status significant">Significant</span></td><td>Recently consolidated via <code>Badge tone</code> variant — but ~80 inline chip overrides existed pre-migration (PR #94 May 17).</td><td class="vol">Badge tone-variant landed · chip className overrides still surface in feedback-button.tsx, mixpanel-settings.tsx</td></tr>
-      <tr><td class="id">A03</td><td class="name">Application convention</td><td><span class="status major">Major</span></td><td>No project-level <code>&lt;PageHeader&gt;</code> / <code>useQueryFilters</code> primitives — 28 pages roll their own h1 hero + filter state.</td><td class="vol">0 / 28 pages use PageHeader · 0 / 28 use useQueryFilters · 11 inline h1s with 3 distinct className recipes</td></tr>
-      <tr><td class="id">A04</td><td class="name">Color tokens</td><td><span class="status ok">OK</span></td><td>Slate/zinc/semantic-color discipline is high; only 1 stray gray-* in the entire app (cleanup admin panel).</td><td class="vol">1 file · 1 hit · 0 zinc creep in pages</td></tr>
-      <tr><td class="id">A05</td><td class="name">Typography</td><td><span class="status significant">Significant</span></td><td>11 inline h1s with 3 different className recipes (<code>text-3xl font-bold</code> vs <code>text-3xl font-semibold</code> vs <code>text-2xl font-bold</code>). 7 eyebrow variants.</td><td class="vol">h1 variants: 3 · eyebrow variants: 7 · ladder spread acceptable</td></tr>
-      <tr><td class="id">A06</td><td class="name">Radii</td><td><span class="status minor">Minor</span></td><td>Mixed scale — <code>rounded-md</code> 76, <code>rounded-lg</code> 58, bare <code>rounded</code> 239. No <code>rounded-xl</code> usages — toolkit standard for card surfaces.</td><td class="vol">md 76 · lg 58 · full 28 · bare 239 · xl 0 · 2xl 0</td></tr>
-      <tr><td class="id">A07</td><td class="name">Responsiveness · grids</td><td><span class="status minor">Minor</span></td><td>App is dashboard-only; sidebar plus single-column page is the dominant pattern. Coverage is adequate for the target form factor (desktop).</td><td class="vol">grid-cols-* + md:/lg: pairs present on dashboard cards</td></tr>
-      <tr><td class="id">A08</td><td class="name">Accessibility</td><td><span class="status significant">Significant</span></td><td>Sparse aria coverage on icon-only controls; no reduced-motion gate despite 22 files using <code>animate-spin</code>.</td><td class="vol">aria-label files: 10 / 245 · aria-describedby: 0 · role=: 1 · sr-only: 3 · prefers-reduced-motion: 0</td></tr>
-      <tr><td class="id">A09</td><td class="name">Motion</td><td><span class="status significant">Significant</span></td><td><code>animate-spin</code> appears in 22 files, <code>animate-pulse</code> in 7 files outside Skeleton — no <code>prefers-reduced-motion</code> gate anywhere.</td><td class="vol">animate-spin: 22 files · animate-pulse: 7 files (outside Skeleton) · motion gate: 0</td></tr>
-      <tr><td class="id">A10</td><td class="name">Forms</td><td><span class="status minor">Minor</span></td><td>Input / Select / Switch primitives present in <code>components/ui/</code>; adoption uneven on integration-settings pages.</td><td class="vol">components/ui/input, select, switch, label exist</td></tr>
-      <tr><td class="id">A11</td><td class="name">Data display</td><td><span class="status minor">Minor</span></td><td>Five files use <code>tabular-nums</code>; numeric KPI cards on dashboard + clients tab miss it.</td><td class="vol">tabular-nums files: 5 · KPI columns w/o it: ~10</td></tr>
-      <tr><td class="id">A12</td><td class="name">Dark / theme mode</td><td><span class="status significant">Significant</span></td><td>62% of <code>bg-*</code> classes are light-only (no <code>dark:</code> pair). Theme provider works but coverage is partial.</td><td class="vol">total bg-*: 276 · dark:bg-*: 105 · light-only: 171 (62%)</td></tr>
-      <tr><td class="id">A13</td><td class="name">Hygiene</td><td><span class="status significant">Significant</span></td><td>131 <code>as any</code> casts, 16 TODOs, 5 console residue calls (auth + settings). <code>as any</code> is the established escape hatch for un-typed Supabase tables per CLAUDE.md.</td><td class="vol">as any: 131 · TODO: 16 · console.log/warn: 5</td></tr>
-      <tr><td class="id">A14</td><td class="name">Responsiveness · tables</td><td><span class="status significant">Significant</span></td><td>14 files render <code>&lt;table&gt;</code> / <code>&lt;Table&gt;</code> but only 2 wrap in <code>overflow-x</code>. Tickets, meetings, clients tables overflow on narrow viewports.</td><td class="vol">tables: 14 files · overflow-x wrappers: 2 files · column-hiding: minimal</td></tr>
+      <tr><td class="id">A01</td><td class="name">Primitives</td><td><span class="status significant">Significant</span></td><td><code>components/ui/avatar.tsx</code> is defined-but-unused (<strong>0 callers</strong>). 17 Radix-derived primitives present, adoption otherwise strong.</td><td class="vol">avatar:0 · badge:24 · button:32 · card:26 · dialog:6 · input:12 · select:9 · table:11</td></tr>
+      <tr><td class="id">A02</td><td class="name">Library convention</td><td><span class="status significant">Significant</span></td><td>Recently-added <code>Badge tone</code> variant (PR&nbsp;#94, May&nbsp;17) is correct — but four named files still pre-date the migration and use <code>className</code> overrides for tone.</td><td class="vol">feedback-button.tsx:111,121 · mixpanel-settings.tsx:992 · trigger-analysis-button.tsx:47,52,56 · roadmap-detail.tsx:37-42</td></tr>
+      <tr><td class="id">A03</td><td class="name">Application convention</td><td><span class="status major">Major</span></td><td><code>&lt;PageHeader&gt;</code> and <code>useQueryFilters</code> <strong>do not exist in the codebase</strong> — grep returns 0 hits. Every page reinvents its own h1 + filter-state recipe.</td><td class="vol">0 / 28 pages use PageHeader · 0 / 28 use useQueryFilters · 11 inline h1s in 3 className recipes</td></tr>
+      <tr><td class="id">A04</td><td class="name">Color tokens</td><td><span class="status ok">OK</span></td><td>Across 245 files, <strong>1</strong> stray <code>gray-*</code> hit (intentional terminal background at <code>admin/cleanup/cleanup-content.tsx:96</code>). Slate / semantic-color discipline is otherwise complete.</td><td class="vol">gray-* files: 1 · zinc creep in pages: 0</td></tr>
+      <tr><td class="id">A05</td><td class="name">Typography</td><td><span class="status significant">Significant</span></td><td>11 inline h1 sites with 3 className recipes: <code>text-3xl font-bold</code> (clients, tickets, quality, product-insights, settings), <code>text-3xl font-semibold</code> (login), <code>text-2xl font-bold</code> (ticket-detail). 7 distinct "eyebrow label" recipes.</td><td class="vol">h1 recipes: 3 (8/1/2 sites) · eyebrow variants: 7 · no <code>&lt;Eyebrow&gt;</code> primitive</td></tr>
+      <tr><td class="id">A06</td><td class="name">Radii</td><td><span class="status minor">Minor</span></td><td><code>rounded-md</code> (76) + <code>rounded-lg</code> (58) dominate; <strong>0</strong> uses of <code>rounded-xl</code>. Bare <code>rounded</code> appears 239 times — likely shadcn fallback, not drift.</td><td class="vol">md 76 · lg 58 · full 28 · bare 239 · xl 0 · 2xl 0</td></tr>
+      <tr><td class="id">A07</td><td class="name">Responsiveness · grids</td><td><span class="status minor">Minor</span></td><td>Dashboard cards use <code>md:grid-cols-*</code>; app is desktop-target by product intent. No mobile reflow strategy below <code>md</code>.</td><td class="vol">md:/lg: pairs present on dashboard cards · sm: rare</td></tr>
+      <tr><td class="id">A08</td><td class="name">Accessibility</td><td><span class="status significant">Significant</span></td><td>10 files have any <code>aria-label</code> (4% adoption); <code>aria-describedby</code>: 0; <code>role=</code>: 1; <code>sr-only</code>: 3. Icon-only Loader2/X/ChevronDown buttons render label-less.</td><td class="vol">aria-label files: 10/245 · aria-describedby: 0 · role=: 1 · sr-only: 3 · prefers-reduced-motion: 0</td></tr>
+      <tr><td class="id">A09</td><td class="name">Motion</td><td><span class="status significant">Significant</span></td><td>22 <code>animate-spin</code> files (all Loader2 on action buttons); 7 files use <code>animate-pulse</code> outside <code>Skeleton</code> (<code>integrations-landing.tsx</code> alone has 6). Zero <code>prefers-reduced-motion</code> gates.</td><td class="vol">animate-spin: 22 · animate-pulse outside Skeleton: 7 · motion gate: 0</td></tr>
+      <tr><td class="id">A10</td><td class="name">Forms</td><td><span class="status minor">Minor</span></td><td>Input / Select / Switch / Label primitives exist in <code>components/ui/</code>; adoption uneven on integration-settings pages but no native-dialog (<code>window.confirm/alert/prompt</code>) usage anywhere — <strong>0 hits</strong>.</td><td class="vol">input: 12 callers · select: 9 callers · switch: 1 · window.confirm/alert/prompt: 0</td></tr>
+      <tr><td class="id">A11</td><td class="name">Data display</td><td><span class="status minor">Minor</span></td><td>5 files use <code>tabular-nums</code>; the dashboard KPI cards + clients health column don't, so numerics wobble across rows.</td><td class="vol">tabular-nums: 5 files · ~10 KPI columns missing it</td></tr>
+      <tr><td class="id">A12</td><td class="name">Dark / theme mode</td><td><span class="status significant">Significant</span></td><td>62% light-only ratio across surface declarations. Status-chip maps in <code>clients/[id]/page.tsx:665-672</code> have <strong>no dark pairs</strong>; <code>roadmap-detail.tsx:37-42</code> map <em>does</em> have them — inconsistency, not absence.</td><td class="vol">total bg-*: 276 · dark:bg-*: 105 · light-only: 171 (62%)</td></tr>
+      <tr><td class="id">A13</td><td class="name">Hygiene</td><td><span class="status significant">Significant</span></td><td>131 <code>as any</code> — CLAUDE.md notes most are load-bearing escape hatches for un-typed Supabase tables. Residue is the smaller story: <code>integrations-landing.tsx:163</code> ships a debug <code>console.log("Migration SQL:", data.sql)</code>; 4 <code>console.warn</code> calls in <code>session-refresh.tsx</code> (L85, L97, L127, L140) are intentional auth-failure logging.</td><td class="vol">as any: 131 (mostly load-bearing) · TODO: 16 · console.log: 1 (residue) · console.warn: 4 (intentional)</td></tr>
+      <tr><td class="id">A14</td><td class="name">Responsiveness · tables</td><td><span class="status significant">Significant</span></td><td>14 files render <code>&lt;table&gt;</code> / <code>&lt;Table&gt;</code>, <strong>2 wrap in <code>overflow-x</code></strong>. <code>tickets-content.tsx</code>, <code>meetings-content.tsx</code>, <code>clients-content.tsx</code> tables overflow on narrow viewports. No <code>md:table-cell</code> / <code>sm:hidden</code> column-hiding pattern anywhere.</td><td class="vol">tables: 14 · overflow-x wrappers: 2 · column-hiding usages: 0</td></tr>
     </tbody>
   </table>
 
-  <h2 class="section-title">Section 1 · Axes in detail <span class="sub">evidence + BEFORE / AFTER for each non-OK axis</span></h2>
+  <h2 class="section-title">Section 1 · Axes in detail <span class="sub">named-component findings + BEFORE / AFTER per non-OK axis</span></h2>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A03</span>
       <span class="axis-name">Application convention</span>
       <span class="status major">Major</span>
-      <span class="scope">app/(dashboard)/**/page.tsx · 28 pages</span>
+      <span class="scope">28 pages · primitive absent from the tree</span>
+    </div>
+    <div class="finding major-finding">
+      <div class="lead">Named finding</div>
+      <div class="body"><code>PageHeader</code> and <code>useQueryFilters</code> are not just <em>unused</em> — they <strong>do not exist</strong> in the codebase. <code>grep -r "function PageHeader\|const PageHeader" components/</code> returns 0 hits. <code>grep -r "useQueryFilters"</code> returns 0 hits. Every page in <code>app/(dashboard)/</code> ships its own h1 + filter recipe by copy-paste from a neighbour.</div>
     </div>
     <div class="evidence">
-      <div class="lbl">Pattern</div>
+      <div class="lbl">Supporting evidence</div>
       <ul>
-        <li>0 / 28 pages use <code>&lt;PageHeader&gt;</code> — the primitive doesn't exist in <code>components/ui/</code>.</li>
-        <li>0 / 28 pages use a <code>useQueryFilters</code> hook — each page hand-rolls URL-search-param sync.</li>
-        <li class="citation">app/(dashboard)/clients/clients-content.tsx:135 → <code>&lt;h1 className="text-3xl font-bold tracking-tight"&gt;Clients&lt;/h1&gt;</code></li>
-        <li class="citation">app/(dashboard)/tickets/tickets-content.tsx:229 → same pattern, copied</li>
-        <li class="citation">app/(dashboard)/quality/quality-content.tsx:54,88 → defined twice in one file</li>
+        <li>3 className recipes for the same logical "page title":</li>
+        <li class="citation">  <code>text-3xl font-bold tracking-tight</code> → clients-content.tsx:135, tickets-content.tsx:229, quality-content.tsx:54+88, product-insights-content.tsx:227, settings/page.tsx:46</li>
+        <li class="citation">  <code>text-3xl font-semibold tracking-tight</code> → login-form.tsx:44</li>
+        <li class="citation">  <code>text-2xl font-bold tracking-tight</code> → tickets/[id]/page.tsx:132</li>
+        <li>quality-content.tsx renders the same hero <strong>twice</strong> in one file (L54 + L88) for branching states.</li>
       </ul>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · per-page hero</div>
+        <div class="tag"><span class="dot"></span>Before · clients-content.tsx:133-160</div>
         <div class="demo">
           <div style="font-size:24px;font-weight:700;letter-spacing:-0.01em;">Clients</div>
-          <div style="font-size:13px;color:#64748B;margin-top:6px;">Browse organizations and their meeting / ticket activity</div>
+          <div style="font-size:13px;color:#64748B;margin-top:4px;">Client health overview and relationship tracking</div>
+          <div style="margin-top:10px;padding:14px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;">
+            <div style="display:flex;gap:10px;align-items:flex-end;font-size:11px;">
+              <div>
+                <div style="font-size:10px;color:#64748B;font-weight:500;margin-bottom:3px;">Team</div>
+                <div style="padding:5px 9px;border:1px solid #E2E8F0;border-radius:6px;width:200px;color:#94A3B8;">All Teams</div>
+              </div>
+              <div>
+                <div style="font-size:10px;color:#64748B;font-weight:500;margin-bottom:3px;">Employee</div>
+                <div style="padding:5px 9px;border:1px solid #E2E8F0;border-radius:6px;width:200px;color:#94A3B8;">All Employees</div>
+              </div>
+            </div>
+          </div>
         </div>
-<div class="code"><span class="cmt">// app/(dashboard)/clients/clients-content.tsx · L135-138</span>
-&lt;<span class="raw">h1</span> className="text-3xl font-bold tracking-tight"&gt;Clients&lt;/<span class="raw">h1</span>&gt;
-&lt;<span class="raw">p</span>  className="text-sm text-muted-foreground"&gt;Browse organizations…&lt;/<span class="raw">p</span>&gt;
-&lt;<span class="raw">div</span> className="flex gap-2 mt-4"&gt; <span class="cmt">/* hand-rolled toolbar */</span> &lt;/<span class="raw">div</span>&gt;</div>
+<div class="code"><span class="cmt">// app/(dashboard)/clients/clients-content.tsx · L132-140</span>
+&lt;<span class="raw">div</span> className="space-y-6"&gt;
+  &lt;<span class="raw">div</span>&gt;
+    &lt;<span class="raw">h1</span> className="text-3xl font-bold tracking-tight"&gt;Clients&lt;/<span class="raw">h1</span>&gt;
+    &lt;<span class="raw">p</span> className="text-muted-foreground"&gt;Client health overview…&lt;/<span class="raw">p</span>&gt;
+  &lt;/<span class="raw">div</span>&gt;
+  &lt;<span class="tok">Card</span>&gt; &lt;<span class="tok">CardContent</span>&gt; <span class="cmt">/* hand-rolled FilterMultiSelect row */</span>
+  …</div>
       </div>
       <div class="a">
-        <div class="tag"><span class="dot"></span>After · shared primitive</div>
+        <div class="tag"><span class="dot"></span>After · &lt;PageHeader&gt; primitive</div>
         <div class="demo">
           <div style="font-size:24px;font-weight:600;letter-spacing:-0.01em;">Clients</div>
-          <div style="font-size:13px;color:#64748B;margin-top:6px;">Browse organizations and their meeting / ticket activity</div>
-          <div style="margin-top:8px;height:1px;background:#E2E8F0;"></div>
+          <div style="font-size:13px;color:#64748B;margin-top:4px;">Client health overview and relationship tracking</div>
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="pm-chip canonical">team: any</span>
+            <span class="pm-chip canonical">employee: any</span>
+          </div>
+          <div style="margin-top:10px;height:1px;background:#E2E8F0;"></div>
         </div>
-<div class="code"><span class="cmt">// app/(dashboard)/clients/clients-content.tsx · same line</span>
+<div class="code"><span class="cmt">// components/ui/page-header.tsx (NEW primitive)</span>
 &lt;<span class="tok">PageHeader</span>
   title="Clients"
-  description="Browse organizations…"
-  actions={&lt;<span class="tok">ClientToolbar</span> /&gt;}
-/&gt;</div>
+  description="Client health overview…"
+  filters={&lt;<span class="tok">FilterBar</span> .../&gt;}
+/&gt;
+<span class="cmt">// hooks/use-query-filters.ts (NEW)</span>
+<span class="raw">const</span> { teamIds, employeeIds, setTeamIds } = <span class="tok">useQueryFilters</span>(…);</div>
       </div>
     </div>
-    <div class="delta-row">Δ −28 inline h1 blocks · +1 PageHeader primitive · +1 useQueryFilters hook</div>
+    <div class="delta-row">Δ +2 new primitives (PageHeader, useQueryFilters) · −28 inline hero blocks · −28 hand-rolled filter-state hooks</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A01</span>
+      <span class="axis-name">Primitives — avatar is defined-but-unused</span>
+      <span class="status significant">Significant</span>
+      <span class="scope">components/ui/avatar.tsx · 0 callers</span>
+    </div>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body"><code>components/ui/avatar.tsx</code> exports <code>Avatar</code>, <code>AvatarImage</code>, <code>AvatarFallback</code> — but <code>grep -rln "from \"@/components/ui/avatar\""</code> returns <strong>0 callers</strong>. The primitive is dead weight, or call sites have been bypassing it with inline <code>&lt;img&gt;</code> tags / icon initials. Smoking-gun #2 (defined-but-unused primitive) from the SKILL.md checklist.</div>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Adoption table (every <code>components/ui/*</code> primitive)</div>
+      <ul>
+        <li>badge: 24 · button: 32 · card: 26 · skeleton: 10 · table: 11 · input: 12 · select: 9 · dialog: 6 · separator: 6 · label: 5 · tabs: 5 · filter-multi-select: 8</li>
+        <li><strong>avatar: 0</strong> · sheet: 1 · switch: 1 · mention-input: 1 · dropdown-menu: 1 (low-adoption tier)</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · primitive sits unused</div>
+        <div class="demo">
+          <div style="font-family:var(--mono);font-size:11px;color:#64748B;background:#FAFBFC;padding:10px;border:1px dashed #CBD5E1;border-radius:6px;">
+            components/ui/avatar.tsx → exports Avatar, AvatarImage, AvatarFallback<br/>
+            <span style="color:#B91C1C;">callers in app/ + components/ → 0</span>
+          </div>
+        </div>
+<div class="code"><span class="cmt">// components/ui/avatar.tsx — Radix wrapper, ~30 lines</span>
+<span class="raw">export const</span> <span class="tok">Avatar</span> = AvatarPrimitive.Root;
+<span class="raw">export const</span> <span class="tok">AvatarImage</span> = AvatarPrimitive.Image;
+<span class="raw">export const</span> <span class="tok">AvatarFallback</span> = AvatarPrimitive.Fallback;
+<span class="cmt">// No file in the tree imports any of these.</span></div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · adopt it or delete it</div>
+        <div class="demo">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div style="width:32px;height:32px;border-radius:99px;background:#EEF2FF;color:#4338CA;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">AC</div>
+            <div style="font-size:12px;color:#0F172A;">Ani Chen <span style="color:#64748B;">· ani@</span></div>
+          </div>
+        </div>
+<div class="code"><span class="cmt">// In meeting-participants, clients/[id], employee/uberview, etc.</span>
+&lt;<span class="tok">Avatar</span>&gt;
+  &lt;<span class="tok">AvatarImage</span> src={user.avatarUrl} alt={user.name} /&gt;
+  &lt;<span class="tok">AvatarFallback</span>&gt;{initials(user.name)}&lt;/<span class="tok">AvatarFallback</span>&gt;
+&lt;/<span class="tok">Avatar</span>&gt;
+<span class="cmt">// or: rm components/ui/avatar.tsx if there's no consumer in 6 months</span></div>
+      </div>
+    </div>
+    <div class="delta-row">Δ Decision needed: adopt (3-4 obvious call sites) or delete (-30 LOC of unused Radix wrapper)</div>
   </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A02</span>
-      <span class="axis-name">Library convention</span>
+      <span class="axis-name">Library convention — chip overrides survived the Badge tone migration</span>
       <span class="status significant">Significant</span>
-      <span class="scope">components/feedback/ · components/settings/ · components/roadmap/</span>
+      <span class="scope">4 files · 7 sites · PR&nbsp;#94 (May&nbsp;17) was 80% complete</span>
+    </div>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body"><a href="https://github.com/Intentwise/Intentwise/pull/94">PR&nbsp;#94</a> added a <code>tone</code> variant to <code>Badge</code> and migrated ~80 chip overrides. Four named files were missed: <code>feedback-button.tsx</code> (thumbs-up/down state colors at L111, L121), <code>mixpanel-settings.tsx:992</code> ("Mapped" chip), <code>roadmap-detail.tsx:37-42</code> (status map, has dark pairs but bypasses tone), and <code>trigger-analysis-button.tsx</code> (running/done/error inline state colors at L47, L52, L56 — not even using <code>Badge</code>, just raw spans).</div>
     </div>
     <div class="evidence">
-      <div class="lbl">Pattern</div>
+      <div class="lbl">Citations</div>
       <ul>
-        <li>Badge has a <code>tone</code> variant (merged PR #94, May 17) — but inline overrides remain in non-status contexts.</li>
-        <li class="citation">components/feedback/feedback-button.tsx:109 → <code>bg-green-100 text-green-700</code> (handcrafted "approved" chip)</li>
-        <li class="citation">components/settings/mixpanel-settings.tsx:992 → <code>bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-200</code></li>
-        <li class="citation">components/roadmap/roadmap-detail.tsx:39 → <code>bg-blue-100 text-blue-700</code></li>
+        <li class="citation">feedback-button.tsx:111 → <code>feedback === true ? "bg-green-100 text-green-700"…</code></li>
+        <li class="citation">feedback-button.tsx:121 → <code>feedback === false ? "bg-red-100 text-red-700"…</code></li>
+        <li class="citation">mixpanel-settings.tsx:992 → <code>&lt;Badge className="bg-green-100 text-green-700 …"&gt;Mapped&lt;/Badge&gt;</code></li>
+        <li class="citation">roadmap-detail.tsx:37-42 → <code>statusBadgeColor: Record&lt;RoadmapStatus, string&gt; = { backlog: "bg-slate-100…", next: "bg-blue-100…", in_progress: "bg-amber-100…", done: "bg-green-100…" }</code></li>
+        <li class="citation">trigger-analysis-button.tsx:47-56 → <code>&lt;span className="text-xs text-blue-700 font-medium"&gt;{progress}&lt;/span&gt;</code> for running/done/error</li>
+        <li class="citation">clients/[id]/page.tsx:665-672 → 6-status <code>Record</code> map, no <code>Badge tone</code></li>
       </ul>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · className override on Badge</div>
-        <div class="demo">
-          <span class="pm-chip" style="background:#DCFCE7;color:#15803D;border:1px solid #BBF7D0;">approved</span>
-          <span class="pm-chip" style="background:#DBEAFE;color:#1D4ED8;border:1px solid #BFDBFE;margin-left:6px;">next</span>
+        <div class="tag"><span class="dot"></span>Before · roadmap status map, raw className</div>
+        <div class="demo" style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="pm-chip" style="background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;">backlog</span>
+          <span class="pm-chip in-prog">next</span>
+          <span class="pm-chip warning">in_progress</span>
+          <span class="pm-chip complete">done</span>
         </div>
-<div class="code"><span class="cmt">// feedback-button.tsx</span>
-&lt;<span class="tok">Badge</span>
-  className=<span class="raw">"bg-green-100 text-green-700"</span>&gt;
-  approved
-&lt;/<span class="tok">Badge</span>&gt;</div>
+<div class="code"><span class="cmt">// components/roadmap/roadmap-detail.tsx · L37-42</span>
+<span class="raw">const</span> <span class="tok">statusBadgeColor</span>: Record&lt;RoadmapStatus, string&gt; = {
+  backlog:     <span class="raw">"bg-slate-100 text-slate-700 dark:bg-slate-800…"</span>,
+  next:        <span class="raw">"bg-blue-100  text-blue-700  dark:bg-blue-950…"</span>,
+  in_progress: <span class="raw">"bg-amber-100 text-amber-800 dark:bg-amber-950…"</span>,
+  done:        <span class="raw">"bg-green-100 text-green-800 dark:bg-green-950…"</span>,
+};
+&lt;<span class="tok">Badge</span> className={statusBadgeColor[status]}&gt;{status}&lt;/<span class="tok">Badge</span>&gt;</div>
       </div>
       <div class="a">
         <div class="tag"><span class="dot"></span>After · tone variant</div>
-        <div class="demo">
-          <span class="pm-chip complete">approved</span>
-          <span class="pm-chip in-prog" style="margin-left:6px;">next</span>
+        <div class="demo" style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="pm-chip" style="background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;">backlog</span>
+          <span class="pm-chip in-prog">next</span>
+          <span class="pm-chip warning">in_progress</span>
+          <span class="pm-chip complete">done</span>
         </div>
-<div class="code"><span class="cmt">// after migration</span>
-&lt;<span class="tok">Badge</span> tone=<span class="tok">"success"</span>&gt;approved&lt;/<span class="tok">Badge</span>&gt;
-&lt;<span class="tok">Badge</span> tone=<span class="tok">"info"</span>&gt;next&lt;/<span class="tok">Badge</span>&gt;</div>
+<div class="code"><span class="cmt">// roadmap-status-badge.tsx · keyed off tone</span>
+<span class="raw">const</span> <span class="tok">TONE_FOR_STATUS</span>: Record&lt;RoadmapStatus, BadgeTone&gt; = {
+  backlog: <span class="tok">"neutral"</span>, next: <span class="tok">"info"</span>,
+  in_progress: <span class="tok">"warning"</span>, done: <span class="tok">"success"</span>,
+};
+&lt;<span class="tok">Badge</span> tone={TONE_FOR_STATUS[status]}&gt;{status}&lt;/<span class="tok">Badge</span>&gt;
+<span class="cmt">// Dark pairs live inside Badge.tsx, not the call site.</span></div>
       </div>
     </div>
-    <div class="delta-row">Δ −~80 className override strings · +0 primitives (tone variant already exists, just needs adoption sweep)</div>
+    <div class="delta-row">Δ −7 missed sites · adoption sweep finishes PR&nbsp;#94 · status-color decisions centralised in Badge.tsx</div>
   </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A05</span>
-      <span class="axis-name">Typography</span>
+      <span class="axis-name">Typography — 3 inline-h1 recipes, 7 eyebrow recipes</span>
       <span class="status significant">Significant</span>
-      <span class="scope">app/(dashboard)/**/*.tsx · 11 inline h1 sites</span>
+      <span class="scope">app/(auth)/ + app/(dashboard)/**/*.tsx</span>
+    </div>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body">The same logical "page title" is rendered with 3 different className recipes — and within <code>quality-content.tsx</code> the same hero is repeated <strong>twice in one file</strong> (L54 + L88) for two branching states. The eyebrow label has 7 recipes for what should be one canonical token.</div>
     </div>
     <div class="evidence">
-      <div class="lbl">Pattern</div>
+      <div class="lbl">Recipe counts</div>
       <ul>
-        <li>3 distinct className recipes for the same logical "page title":</li>
-        <li class="citation">  <code>text-3xl font-bold tracking-tight</code> · clients, tickets, quality, product-insights, settings</li>
-        <li class="citation">  <code>text-3xl font-semibold tracking-tight</code> · login</li>
-        <li class="citation">  <code>text-2xl font-bold tracking-tight</code> · ticket-detail</li>
-        <li>Eyebrow label variants: 7 (text-xs vs text-[10px], tracking-wider vs tracking-wide).</li>
+        <li><code>text-3xl font-bold tracking-tight</code> → 8 files: clients-content, tickets-content, quality-content (×2), product-insights-content (×2), settings/page, dashboard/dashboard-content</li>
+        <li><code>text-3xl font-semibold tracking-tight</code> → 1 file: login-form.tsx:44</li>
+        <li><code>text-2xl font-bold tracking-tight</code> → 1 file: tickets/[id]/page.tsx:132</li>
+        <li>Eyebrow variants (7): <code>text-xs uppercase tracking-wide</code>, <code>text-xs uppercase tracking-wide mb-1</code>, <code>text-xs uppercase tracking-wide mb-2</code>, <code>text-xs uppercase tracking-wider text-muted-foreground font-semibold</code>, <code>text-sm font-medium text-muted-foreground uppercase tracking-wider</code>, <code>text-left text-[10px] uppercase tracking-wider …</code>, <code>text-right text-[10px] uppercase tracking-wider …</code></li>
       </ul>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · 3 recipes</div>
+        <div class="tag"><span class="dot"></span>Before · 3 weights × 2 sizes for "page title"</div>
         <div class="demo" style="display:flex;flex-direction:column;gap:8px;">
           <div style="font-size:24px;font-weight:700;letter-spacing:-0.01em;">Clients</div>
           <div style="font-size:24px;font-weight:600;letter-spacing:-0.01em;">Welcome back</div>
           <div style="font-size:18px;font-weight:700;letter-spacing:-0.01em;">Ticket #1234</div>
         </div>
-<div class="code"><span class="raw">text-3xl font-bold tracking-tight</span>      <span class="cmt">// 8 files</span>
-<span class="raw">text-3xl font-semibold tracking-tight</span>  <span class="cmt">// 1 file</span>
-<span class="raw">text-2xl font-bold tracking-tight</span>      <span class="cmt">// 2 files</span></div>
+<div class="code"><span class="cmt">// 3 distinct className recipes for "the page title"</span>
+<span class="raw">text-3xl font-bold tracking-tight</span>      <span class="cmt">// 8 sites</span>
+<span class="raw">text-3xl font-semibold tracking-tight</span>  <span class="cmt">// 1 site (login)</span>
+<span class="raw">text-2xl font-bold tracking-tight</span>      <span class="cmt">// 1 site (ticket detail)</span></div>
       </div>
       <div class="a">
-        <div class="tag"><span class="dot"></span>After · one recipe</div>
+        <div class="tag"><span class="dot"></span>After · owned by &lt;PageHeader&gt;</div>
         <div class="demo" style="display:flex;flex-direction:column;gap:8px;">
           <div style="font-size:24px;font-weight:600;letter-spacing:-0.01em;">Clients</div>
           <div style="font-size:24px;font-weight:600;letter-spacing:-0.01em;">Welcome back</div>
           <div style="font-size:18px;font-weight:600;letter-spacing:-0.01em;">Ticket #1234</div>
         </div>
-<div class="code"><span class="cmt">// owned by &lt;PageHeader&gt; — no inline className</span>
-&lt;<span class="tok">PageHeader</span> title="Clients" /&gt;
+<div class="code">&lt;<span class="tok">PageHeader</span> title="Clients" /&gt;
 &lt;<span class="tok">PageHeader</span> title="Welcome back" /&gt;
-&lt;<span class="tok">PageHeader</span> title="Ticket #1234" size="sm" /&gt;</div>
+&lt;<span class="tok">PageHeader</span> title="Ticket #1234" size="sm" /&gt;
+<span class="cmt">// All inline h1 className goes away.</span></div>
       </div>
     </div>
-    <div class="delta-row">Δ −3 className recipes → 1 token · −7 eyebrow variants → 1 <code>&lt;Eyebrow&gt;</code> primitive</div>
+    <div class="delta-row">Δ 3 className recipes → 1 PageHeader · 7 eyebrow recipes → 1 <code>&lt;Eyebrow&gt;</code> primitive</div>
   </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A08</span>
-      <span class="axis-name">Accessibility</span>
+      <span class="axis-name">Accessibility — icon-only Loader2 buttons silent to AT</span>
       <span class="status significant">Significant</span>
-      <span class="scope">app/, components/ · 245 files</span>
+      <span class="scope">22 animate-spin sites · 4% aria-label coverage</span>
+    </div>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body">Every <code>Loader2</code> spinner sits inside a <code>&lt;Button&gt;</code> with no <code>aria-label</code> — assistive tech announces "button" with no context. <code>app/(dashboard)/meetings/[id]/analyze-button.tsx:30</code> and <code>app/(dashboard)/tickets/[id]/analyze-button.tsx:31</code> are the canonical bad-shapes. Out of 245 files, only 10 use <code>aria-label</code> at all; <code>aria-describedby</code> count is <strong>0</strong>.</div>
     </div>
     <div class="evidence">
-      <div class="lbl">Pattern</div>
+      <div class="lbl">Coverage by attribute</div>
       <ul>
-        <li>aria-label: 10 files · aria-describedby: 0 · role=: 1 · sr-only: 3</li>
-        <li>0 files mention <code>prefers-reduced-motion</code> despite 22 files animating.</li>
-        <li>Icon-only buttons (Loader2, X, ChevronDown) typically render without aria-label.</li>
+        <li>aria-label: 10 files · aria-describedby: 0 · role=: 1 · sr-only: 3 · aria-hidden: 2 · tabIndex: 1</li>
+        <li>prefers-reduced-motion gate: 0 files · animate-spin: 22 files · animate-pulse outside Skeleton: 7 files</li>
       </ul>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · icon-only buttons silent to AT</div>
+        <div class="tag"><span class="dot"></span>Before · analyze-button.tsx:30</div>
         <div class="demo">
-          <button class="pm-btn" style="padding:5px 7px;"><span class="pm-spinner"></span></button>
-          <button class="pm-btn" style="padding:5px 7px;margin-left:6px;">×</button>
+          <button class="pm-btn primary" style="padding:6px 11px;display:inline-flex;align-items:center;gap:6px;"><span class="pm-spinner" style="border-top-color:#fff;"></span>Analyzing...</button>
         </div>
-<div class="code">&lt;<span class="raw">Button</span> variant="ghost"&gt;
-  &lt;<span class="tok">Loader2</span> className="animate-spin h-4 w-4" /&gt;
-&lt;/<span class="raw">Button</span>&gt;</div>
+<div class="code"><span class="cmt">// app/(dashboard)/meetings/[id]/analyze-button.tsx · L30</span>
+{analyzing ? (
+  &lt;&gt;&lt;<span class="tok">Loader2</span> className="mr-2 h-4 w-4 animate-spin" /&gt;Analyzing...&lt;/&gt;
+) : (
+  &lt;&gt;&lt;<span class="tok">Play</span> className="mr-2 h-4 w-4" /&gt;Run Analysis&lt;/&gt;
+)}</div>
       </div>
       <div class="a">
-        <div class="tag"><span class="dot"></span>After · labeled, motion-aware</div>
+        <div class="tag"><span class="dot"></span>After · labeled + motion-gate</div>
         <div class="demo">
-          <button class="pm-btn" style="padding:5px 7px;"><span class="pm-spinner"></span></button>
-          <button class="pm-btn" style="padding:5px 7px;margin-left:6px;">×</button>
+          <button class="pm-btn primary" style="padding:6px 11px;display:inline-flex;align-items:center;gap:6px;"><span class="pm-spinner" style="border-top-color:#fff;"></span>Analyzing...</button>
         </div>
-<div class="code">&lt;<span class="tok">Button</span> variant="ghost" aria-label=<span class="tok">"Loading"</span>&gt;
-  &lt;<span class="tok">Loader2</span> className="animate-spin motion-reduce:hidden h-4 w-4" /&gt;
-  &lt;<span class="tok">span</span> className="sr-only"&gt;Loading…&lt;/<span class="tok">span</span>&gt;
+<div class="code">&lt;<span class="tok">Button</span> aria-label={analyzing ? <span class="tok">"Analysis running"</span> : <span class="tok">"Run analysis"</span>}&gt;
+  {analyzing ? (
+    &lt;&gt;&lt;<span class="tok">Loader2</span> className="mr-2 h-4 w-4 animate-spin motion-reduce:hidden" /&gt;
+       &lt;<span class="tok">span</span> className="sr-only"&gt;Analyzing&lt;/<span class="tok">span</span>&gt;Analyzing...&lt;/&gt;
+  ) : (
+    &lt;&gt;&lt;<span class="tok">Play</span> className="mr-2 h-4 w-4" /&gt;Run Analysis&lt;/&gt;
+  )}
 &lt;/<span class="tok">Button</span>&gt;</div>
       </div>
     </div>
-    <div class="delta-row">Δ +aria-label on ~40 icon buttons · +motion-reduce gate on 22 animated files</div>
+    <div class="delta-row">Δ +aria-label on ~40 icon buttons · +motion-reduce class on 22 animate-spin sites</div>
   </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A09</span>
-      <span class="axis-name">Motion</span>
+      <span class="axis-name">Motion — 7 ad-hoc pulse loaders in one file</span>
       <span class="status significant">Significant</span>
-      <span class="scope">22 animate-spin files · 7 animate-pulse files (outside Skeleton)</span>
+      <span class="scope">integrations-landing.tsx · mixpanel-settings.tsx</span>
+    </div>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body"><code>components/settings/integrations-landing.tsx</code> alone has <strong>6 hand-rolled</strong> <code>&lt;div className="h-N rounded-lg bg-muted animate-pulse" /&gt;</code> blocks (L211, L547, L560-561, L575-576) — three of which are siblings. <code>mixpanel-settings.tsx</code> has 3 more (L621-623). The canonical <code>Skeleton</code> primitive at <code>components/ui/skeleton.tsx</code> is 1 line of JSX; nobody had a reason to skip it, but they did.</div>
     </div>
     <div class="evidence">
-      <div class="lbl">Pattern</div>
+      <div class="lbl">Sites</div>
       <ul>
-        <li>22 files use <code>animate-spin</code> (Loader2 on submit / analyze buttons).</li>
-        <li>7 files use <code>animate-pulse</code> outside the canonical Skeleton primitive — usually hand-rolled <code>bg-muted</code> placeholders.</li>
-        <li>0 files gate motion on <code>prefers-reduced-motion</code>.</li>
+        <li class="citation">integrations-landing.tsx:211, 547, 560, 561, 575, 576 (6 sites · single file)</li>
+        <li class="citation">mixpanel-settings.tsx:621, 622, 623 (3 sites · grouped)</li>
+        <li class="citation">notification-settings.tsx:222 (1 site)</li>
+        <li class="citation">dashboard-content.tsx:96 — <code>animate-pulse</code> on a status indicator dot, not a skeleton (intentional)</li>
       </ul>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · hand-rolled pulse blocks</div>
+        <div class="tag"><span class="dot"></span>Before · 6 hand-rolled blocks in integrations-landing.tsx</div>
         <div class="demo">
-          <div style="height:20px;width:100%;background:#E2E8F0;border-radius:6px;margin-bottom:6px;opacity:.6;"></div>
-          <div style="height:20px;width:60%;background:#E2E8F0;border-radius:6px;opacity:.6;"></div>
+          <div style="height:20px;width:100%;background:#E2E8F0;border-radius:6px;margin-bottom:6px;animation:pulse 1.4s ease-in-out infinite;opacity:.6;"></div>
+          <div style="height:20px;width:60%;background:#E2E8F0;border-radius:6px;animation:pulse 1.4s ease-in-out infinite;opacity:.6;"></div>
+          <style>@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }</style>
         </div>
-<div class="code"><span class="cmt">// integrations-landing.tsx, mixpanel-settings.tsx, …</span>
-&lt;<span class="raw">div</span> className="h-20 rounded-lg bg-muted animate-pulse" /&gt;</div>
+<div class="code"><span class="cmt">// integrations-landing.tsx · L211, L547, L560-561, L575-576</span>
+&lt;<span class="raw">div</span> className=<span class="raw">"h-44 rounded-lg bg-muted animate-pulse"</span> /&gt;
+&lt;<span class="raw">div</span> className=<span class="raw">"h-20 rounded-lg bg-muted animate-pulse"</span> /&gt;
+&lt;<span class="raw">div</span> className=<span class="raw">"h-64 rounded-lg bg-muted animate-pulse"</span> /&gt;
+…</div>
       </div>
       <div class="a">
-        <div class="tag"><span class="dot"></span>After · Skeleton primitive everywhere</div>
+        <div class="tag"><span class="dot"></span>After · canonical Skeleton</div>
         <div class="demo">
-          <div class="pm-strip" style="height:20px;border-radius:6px;background:#E2E8F0;margin-bottom:6px;"></div>
-          <div class="pm-strip" style="height:20px;border-radius:6px;width:60%;background:#E2E8F0;"></div>
+          <div style="height:20px;width:100%;background:#E2E8F0;border-radius:6px;margin-bottom:6px;animation:pulse 1.4s ease-in-out infinite;opacity:.6;"></div>
+          <div style="height:20px;width:60%;background:#E2E8F0;border-radius:6px;animation:pulse 1.4s ease-in-out infinite;opacity:.6;"></div>
         </div>
-<div class="code">&lt;<span class="tok">Skeleton</span> className="h-20 rounded-lg" /&gt;
-<span class="cmt">// Skeleton honours prefers-reduced-motion internally</span></div>
+<div class="code">&lt;<span class="tok">Skeleton</span> className="h-44 rounded-lg" /&gt;
+&lt;<span class="tok">Skeleton</span> className="h-20 rounded-lg" /&gt;
+&lt;<span class="tok">Skeleton</span> className="h-64 rounded-lg" /&gt;
+<span class="cmt">// Skeleton honours prefers-reduced-motion internally.</span></div>
       </div>
     </div>
-    <div class="delta-row">Δ −7 hand-rolled pulse blocks → +Skeleton adoption · +motion-reduce gate at primitive level</div>
+    <div class="delta-row">Δ −10 hand-rolled pulse blocks → +Skeleton adoption · motion-gate baked into the primitive</div>
   </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A12</span>
-      <span class="axis-name">Dark / theme mode</span>
+      <span class="axis-name">Dark / theme mode — inconsistent, not absent</span>
       <span class="status significant">Significant</span>
-      <span class="scope">62% light-only — 171 / 276 bg-* classes</span>
+      <span class="scope">2 status-chip maps disagree on dark pairs</span>
+    </div>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body"><code>roadmap-detail.tsx:37-42</code> ships full <code>dark:bg-*</code> / <code>dark:text-*</code> pairs on its status map. <code>clients/[id]/page.tsx:665-672</code> ships the same shape of status map with <strong>zero dark pairs</strong>. Two adjacent feature areas, same problem, two different answers — that's a missing primitive, not a missing palette.</div>
     </div>
     <div class="evidence">
-      <div class="lbl">Pattern</div>
+      <div class="lbl">Coverage</div>
       <ul>
-        <li>Total <code>bg-*-NNN</code> classes: 276 · with paired <code>dark:bg-*</code>: 105 · light-only: 171 (62%).</li>
-        <li>Status chips at <code>bg-green-50 text-green-700</code> rarely have dark pairs (already noted on A02).</li>
-        <li>Theme provider + sidebar dark-mode work; in-page surfaces lag.</li>
+        <li>Total <code>bg-*-NNN</code>: 276 · paired <code>dark:bg-*</code>: 105 · light-only: 171 (62%)</li>
+        <li>roadmap-detail.tsx map: <strong>4 / 4</strong> dark pairs present</li>
+        <li>clients/[id]/page.tsx map: <strong>0 / 6</strong> dark pairs</li>
+        <li>mixpanel-settings.tsx:992 chip: has dark pair (<code>dark:bg-green-950 dark:text-green-200</code>) — but uses different shade than roadmap-detail (<code>dark:bg-green-950 dark:text-green-200</code> vs <code>dark:bg-green-950 dark:text-green-200</code>). Same code; coincidence — but no shared primitive.</li>
       </ul>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · status chip light-only</div>
-        <div class="demo" style="display:flex;gap:8px;flex-wrap:wrap;">
-          <span class="pm-chip" style="background:#DCFCE7;color:#15803D;border:1px solid #BBF7D0;">resolved</span>
-          <span class="pm-chip" style="background:#DBEAFE;color:#1D4ED8;border:1px solid #BFDBFE;">in_progress</span>
+        <div class="tag"><span class="dot"></span>Before · two maps, two opinions</div>
+        <div class="demo">
+          <div style="font-family:var(--mono);font-size:11px;color:#475569;line-height:1.6;">
+            <strong style="color:#0F172A;">roadmap-detail.tsx:</strong><br/>
+            <span style="color:#15803D;">in_progress: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200"</span><br/><br/>
+            <strong style="color:#0F172A;">clients/[id]/page.tsx:</strong><br/>
+            <span style="color:#B91C1C;">in_progress: "bg-blue-50 text-blue-700 border-blue-200"</span>
+          </div>
         </div>
-<div class="code">&lt;<span class="raw">Badge</span> className=<span class="raw">"bg-green-50 text-green-700 border-green-200"</span>&gt;
-  resolved
-&lt;/<span class="raw">Badge</span>&gt;</div>
+<div class="code"><span class="cmt">// Two maps, same intent ("status badge"), different rules</span>
+<span class="cmt">// roadmap-detail.tsx:39</span>
+in_progress: <span class="raw">"bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200"</span>,
+<span class="cmt">// clients/[id]/page.tsx:669</span>
+in_progress: <span class="raw">"bg-blue-50 text-blue-700 border-blue-200"</span>,</div>
       </div>
       <div class="a">
-        <div class="tag"><span class="dot"></span>After · tone variant flips per theme</div>
-        <div class="demo" style="display:flex;gap:8px;flex-wrap:wrap;">
-          <span class="pm-chip complete">resolved</span>
-          <span class="pm-chip in-prog">in_progress</span>
+        <div class="tag"><span class="dot"></span>After · one Badge tone primitive owns it</div>
+        <div class="demo">
+          <span class="pm-chip warning">in_progress</span>
         </div>
-<div class="code">&lt;<span class="tok">Badge</span> tone=<span class="tok">"success"</span>&gt;resolved&lt;/<span class="tok">Badge</span>&gt;
-&lt;<span class="tok">Badge</span> tone=<span class="tok">"info"</span>&gt;in_progress&lt;/<span class="tok">Badge</span>&gt;
-<span class="cmt">// dark: pairs baked into Badge.tsx</span></div>
+<div class="code">&lt;<span class="tok">Badge</span> tone=<span class="tok">"warning"</span>&gt;in_progress&lt;/<span class="tok">Badge</span>&gt;
+<span class="cmt">// Badge.tsx defines the dark pair once, in one place</span>
+<span class="raw">const</span> <span class="tok">TONE_CLASSES</span> = {
+  warning: <span class="raw">"bg-amber-100 text-amber-800 "</span> +
+           <span class="raw">"dark:bg-amber-950 dark:text-amber-200"</span>,
+  …
+}</div>
       </div>
     </div>
-    <div class="delta-row">Δ −171 light-only surface declarations · +dark: pairs centralised in primitives (Badge tone, Card surface)</div>
+    <div class="delta-row">Δ −2 status-map definitions · +1 tone-level decision · 171 light-only surfaces shrink via primitive promotion</div>
   </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A13</span>
-      <span class="axis-name">Hygiene</span>
+      <span class="axis-name">Hygiene — console.log in production code</span>
       <span class="status significant">Significant</span>
-      <span class="scope">app/, components/, lib/</span>
+      <span class="scope">integrations-landing.tsx:163 · session-refresh.tsx (×4 intentional)</span>
+    </div>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body">The only real residue is one debug <code>console.log("Migration SQL:", data.sql)</code> at <code>integrations-landing.tsx:163</code> — fires on every migration-setup failure and dumps SQL into the user's devtools. The 4 <code>console.warn</code> calls in <code>session-refresh.tsx</code> are intentional auth-failure logging; not residue but worth replacing with structured logs. The 131 <code>as any</code> casts are load-bearing per CLAUDE.md (un-typed Supabase tables).</div>
     </div>
     <div class="evidence">
-      <div class="lbl">Pattern</div>
+      <div class="lbl">Hygiene breakdown</div>
       <ul>
-        <li><code>as any</code>: 131 occurrences — CLAUDE.md notes this is the established escape hatch for un-typed Supabase tables. Not all are migratable.</li>
-        <li><code>TODO</code>: 16 occurrences across app+components+lib.</li>
-        <li><code>console.log</code> / <code>console.warn</code> residue: 5 (integrations-landing.tsx + session-refresh.tsx).</li>
-        <li>The <code>as any</code> count is technically OK-by-design — focus the hygiene sweep on console residue + stale TODOs.</li>
+        <li>console.log (residue): <strong>1</strong> · integrations-landing.tsx:163</li>
+        <li>console.warn (intentional auth logging): 4 · session-refresh.tsx:85, 97, 127, 140</li>
+        <li>as any: 131 (most load-bearing per CLAUDE.md — un-typed Supabase tables)</li>
+        <li>TODO: 16 · FIXME: 0</li>
       </ul>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · console residue + drive-by TODO</div>
-        <div class="demo" style="font-family:var(--mono);font-size:11px;color:#475569;">
-          components/settings/integrations-landing.tsx:163 → <span style="color:#B91C1C;">console.log("Migration SQL:", data.sql);</span><br/>
-          components/auth/session-refresh.tsx:85 → <span style="color:#B91C1C;">console.warn("Session refresh failed:", error.message);</span>
+        <div class="tag"><span class="dot"></span>Before · debug log ships to prod</div>
+        <div class="demo">
+          <div style="font-family:var(--mono);font-size:11px;color:#475569;background:#FAFBFC;padding:10px;border:1px dashed #CBD5E1;border-radius:6px;">
+            <span style="color:#B91C1C;">› console.log("Migration SQL:", data.sql);</span><br/>
+            <span style="color:#94A3B8;">"Migration SQL:" CREATE TABLE foo ( id uuid PRIMARY KEY, …</span>
+          </div>
         </div>
-<div class="code"><span class="cmt">// integrations-landing.tsx</span>
-console.<span class="raw">log</span>(<span class="raw">"Migration SQL:"</span>, data.sql);</div>
+<div class="code"><span class="cmt">// components/settings/integrations-landing.tsx · L160-167</span>
+} <span class="raw">else</span> {
+  toast.error(data.message || <span class="raw">"Setup failed. Please apply the migration manually."</span>);
+  <span class="raw">if</span> (data.sql) {
+    console.<span class="raw">log</span>(<span class="raw">"Migration SQL:"</span>, data.sql);
+  }
+}</div>
       </div>
       <div class="a">
-        <div class="tag"><span class="dot"></span>After · structured logging</div>
-        <div class="demo" style="font-family:var(--mono);font-size:11px;color:#475569;">
-          <span style="color:#15803D;">log.info({ event: "migration_generated", sql_lines: data.sql.split("\n").length })</span>
+        <div class="tag"><span class="dot"></span>After · structured + UI-surfaced</div>
+        <div class="demo">
+          <div style="font-family:var(--mono);font-size:11px;background:#FAFBFC;padding:10px;border:1px solid #E2E8F0;border-radius:6px;">
+            <span style="color:#0F172A;">Setup failed.</span> <a style="color:#4338CA;text-decoration:underline;font-family:var(--mono);">view migration SQL →</a>
+          </div>
         </div>
-<div class="code">log.<span class="tok">info</span>({ event: <span class="tok">"migration_generated"</span>,
-            sql_lines: data.sql.split(<span class="tok">"\n"</span>).length });</div>
+<div class="code">} <span class="raw">else</span> {
+  toast.error(data.message || <span class="tok">"Setup failed."</span>, {
+    action: data.sql ? { label: <span class="tok">"View migration SQL"</span>,
+                        onClick: () =&gt; setSqlPreview(data.sql) } : undefined
+  });
+  <span class="cmt">// no console — SQL lives in modal, not devtools.</span>
+}</div>
       </div>
     </div>
-    <div class="delta-row">Δ −5 console residue calls · TODO triage queue established</div>
+    <div class="delta-row">Δ −1 console.log to prod · +1 user-visible "View migration SQL" affordance</div>
   </div>
 
   <div class="axis-card">
     <div class="head">
       <span class="num">A14</span>
-      <span class="axis-name">Responsiveness · tables</span>
+      <span class="axis-name">Responsiveness · tables — 12 tables without overflow wrapper</span>
       <span class="status significant">Significant</span>
-      <span class="scope">14 files with &lt;table&gt; · 2 with overflow-x</span>
+      <span class="scope">tickets-content · meetings-content · clients-content · 11 others</span>
     </div>
-    <div class="evidence">
-      <div class="lbl">Pattern</div>
-      <ul>
-        <li>14 files render <code>&lt;table&gt;</code> or <code>&lt;Table&gt;</code>; only 2 wrap in <code>overflow-x-auto</code>.</li>
-        <li>Tickets, meetings, clients tables overflow on narrow viewports.</li>
-        <li>No column-hiding strategy (no <code>md:table-cell</code> / <code>sm:hidden</code> hits).</li>
-      </ul>
+    <div class="finding">
+      <div class="lead">Named finding</div>
+      <div class="body">14 files render <code>&lt;table&gt;</code> / <code>&lt;Table&gt;</code>; only 2 (<code>competitive-insights</code>, one more) wrap in <code>overflow-x-auto</code>. The big tables — <code>tickets-content.tsx</code> with 7 columns (Subject/Org/Priority/Stage/Owner/Created/Status), <code>meetings-content.tsx</code> with 6, <code>clients-content.tsx</code> with 5 — overflow off the right of narrow viewports without a horizontal scrollbar. <strong>Zero</strong> uses of the <code>hidden md:table-cell</code> column-hiding pattern anywhere in the tree.</div>
     </div>
     <div class="pair">
       <div class="b">
-        <div class="tag"><span class="dot"></span>Before · table overflows on mobile</div>
+        <div class="tag"><span class="dot"></span>Before · table renders off-screen</div>
         <div class="demo">
-          <div style="border:1px solid var(--doc-border);border-radius:6px;background:#fff;">
+          <div style="border:1px solid var(--doc-border);border-radius:6px;background:#fff;overflow:hidden;">
             <div style="display:grid;grid-template-columns:1.4fr 1fr 0.7fr 0.7fr 1fr;gap:8px;padding:6px 10px;font-size:10px;color:#64748B;background:#FAFBFC;border-bottom:1px solid var(--doc-border);text-transform:uppercase;letter-spacing:0.04em;">
               <div>Subject</div><div>Org</div><div>Pri</div><div>Stage</div><div>Owner</div>
             </div>
@@ -502,12 +647,14 @@ console.<span class="raw">log</span>(<span class="raw">"Migration SQL:"</span>, 
             </div>
           </div>
         </div>
-<div class="code">&lt;<span class="raw">table</span> className="w-full"&gt; <span class="cmt">/* no wrapper */</span>
-  &lt;<span class="raw">thead</span>&gt;…&lt;/<span class="raw">thead</span>&gt;
-&lt;/<span class="raw">table</span>&gt;</div>
+<div class="code"><span class="cmt">// tickets-content.tsx — no overflow wrapper</span>
+&lt;<span class="tok">Table</span>&gt;
+  &lt;<span class="tok">TableHeader</span>&gt;…&lt;/<span class="tok">TableHeader</span>&gt;
+  &lt;<span class="tok">TableBody</span>&gt;…&lt;/<span class="tok">TableBody</span>&gt;
+&lt;/<span class="tok">Table</span>&gt;</div>
       </div>
       <div class="a">
-        <div class="tag"><span class="dot"></span>After · overflow-x + column-hiding</div>
+        <div class="tag"><span class="dot"></span>After · overflow + column-hide on md</div>
         <div class="demo">
           <div style="border:1px solid var(--doc-border);border-radius:8px;background:#fff;overflow:hidden;">
             <div style="display:grid;grid-template-columns:1.4fr 1fr 0.7fr 1fr;gap:8px;padding:6px 10px;font-size:10px;color:#64748B;background:#FAFBFC;border-bottom:1px solid var(--doc-border);text-transform:uppercase;letter-spacing:0.04em;">
@@ -519,9 +666,9 @@ console.<span class="raw">log</span>(<span class="raw">"Migration SQL:"</span>, 
           </div>
         </div>
 <div class="code">&lt;<span class="tok">div</span> className=<span class="tok">"overflow-x-auto"</span>&gt;
-  &lt;<span class="tok">table</span>&gt;
-    &lt;<span class="tok">th</span> className=<span class="tok">"hidden md:table-cell"</span>&gt;Stage&lt;/<span class="tok">th</span>&gt;
-  &lt;/<span class="tok">table</span>&gt;
+  &lt;<span class="tok">Table</span>&gt;
+    &lt;<span class="tok">TableHead</span> className=<span class="tok">"hidden md:table-cell"</span>&gt;Stage&lt;/<span class="tok">TableHead</span>&gt;
+  &lt;/<span class="tok">Table</span>&gt;
 &lt;/<span class="tok">div</span>&gt;</div>
       </div>
     </div>
@@ -531,79 +678,91 @@ console.<span class="raw">log</span>(<span class="raw">"Migration SQL:"</span>, 
   <div class="axis-card ok-card">
     <div class="head">
       <span class="num">A04</span>
-      <span class="axis-name">Color tokens</span>
-      <span class="status ok">OK</span>
-      <span class="scope">1 stray gray-* hit · 0 zinc creep</span>
+      <span class="axis-name">Color tokens · A10 Forms</span>
+      <span class="status ok">OK · 2 axes</span>
+      <span class="scope">strong baselines</span>
     </div>
     <div class="single">
-      <strong>Color-token discipline is the strongest signal in this audit.</strong> Across 245 source files we found exactly one <code>gray-*</code> hit (the cleanup admin's terminal-style code preview at <code>bg-gray-900</code>, intentional). Zero <code>zinc-*</code> creep in pages. Slate / semantic colors are the canonical palette throughout. No action needed.
+      <strong>A04 — Color tokens:</strong> Across 245 files, <strong>1</strong> stray <code>gray-*</code> hit at <code>admin/cleanup/cleanup-content.tsx:96</code> (an intentional terminal-look code preview using <code>bg-gray-900 text-green-400</code>). Zero <code>zinc-*</code> creep in pages. This is the strongest axis in the audit.
+      <br/><br/>
+      <strong>A10 — Forms:</strong> Input / Select / Switch / Label primitives all present in <code>components/ui/</code>. Adoption uneven on settings pages (12 input callers, 9 select). No native-browser-dialog usage at all — <code>grep -rn 'window\.(confirm|alert|prompt)\('</code> returns <strong>0</strong>. Smoking-gun #6 from the SKILL.md checklist: clean.
     </div>
   </div>
 
   <div class="axis-card ok-card">
     <div class="head">
-      <span class="num">A01</span>
-      <span class="axis-name">Primitives · A06 Radii · A07 Grids · A10 Forms · A11 Data</span>
-      <span class="status minor">Minor</span>
-      <span class="scope">batch — five low-priority axes</span>
+      <span class="num">A06</span>
+      <span class="axis-name">Radii · A07 Grids · A11 Data display</span>
+      <span class="status minor">Minor · 3 axes</span>
+      <span class="scope">batch</span>
     </div>
     <div class="single">
-      Five axes land at Minor — present and broadly adopted, but with isolated drift sites. <strong>A01</strong>: <code>components/ui/</code> primitives (Skeleton, Badge, Card, Button, Dialog) are used widely; raw <code>&lt;button&gt;</code> appears in a handful of in-app toolbars. <strong>A06</strong>: radii scale leans on <code>rounded-md</code> + bare <code>rounded</code> — toolkit standard <code>rounded-xl</code> for cards isn't established. <strong>A07</strong>: grid coverage is adequate for a desktop-first dashboard. <strong>A10</strong>: form primitives exist; adoption uneven on settings pages. <strong>A11</strong>: 5 files use <code>tabular-nums</code>; numeric KPI columns on dashboard miss it. Each is fixable in one sweep.
+      <strong>A06 — Radii:</strong> <code>rounded-md</code> (76) + <code>rounded-lg</code> (58) dominate; <strong>0</strong> <code>rounded-xl</code>. shadcn Card uses <code>rounded-lg</code> internally — bare <code>rounded</code> count (239) is largely sourced from shadcn primitives, not call-site drift.
+      <br/><br/>
+      <strong>A07 — Grids:</strong> Dashboard cards use <code>md:grid-cols-*</code>; the product is a desktop-target dashboard, not a marketing site. Acceptable for the form factor.
+      <br/><br/>
+      <strong>A11 — Data display:</strong> 5 files use <code>tabular-nums</code>; the dashboard KPI cards + clients health column don't, so numerics wobble. One-sweep fix.
     </div>
   </div>
 
-  <h2 class="section-title">Section 2 · Page in context <span class="sub">app/(dashboard)/clients/clients-content.tsx — highest drift density on this page</span></h2>
+  <h2 class="section-title">Section 2 · Page in context <span class="sub">clients-content.tsx — drift-density leader (A03 + A05 + A12 + A14 visible)</span></h2>
   <div class="context-wrap">
     <div class="context-pair">
       <div class="frame bad">
-        <div class="frame-tag"><span style="display:inline-block;width:8px;height:8px;border-radius:99px;background:currentColor;"></span> Before <span class="meta">A03 + A05 + A12 + A14 visible on this view</span></div>
+        <div class="frame-tag"><span style="display:inline-block;width:8px;height:8px;border-radius:99px;background:currentColor;"></span> Before <span class="meta">A03 + A05 + A12 + A14 visible</span></div>
         <div class="page-mock">
-          <div class="row-with-note"><span class="note bad">A03 — inline h1</span><span class="note bad">A05 — 3xl font-bold variant</span></div>
-          <h1 class="pm-h1 drift">Clients</h1>
-          <p class="pm-sub">Browse organizations and their meeting / ticket activity</p>
-          <div class="row-with-note"><span class="note bad">A03 — hand-rolled toolbar, no useQueryFilters</span></div>
-          <div class="pm-toolbar">
-            <input class="pm-search" placeholder="Search clients…" />
-            <button class="pm-btn">All segments</button>
-            <button class="pm-btn">All tiers</button>
-            <button class="pm-btn primary">+ Add client</button>
+          <div class="row-with-note"><span class="note bad">A03 — primitive doesn't exist</span><span class="note bad">A05 — inline h1, text-3xl font-bold</span></div>
+          <h1 class="pm-h1">Clients</h1>
+          <p class="pm-sub">Client health overview and relationship tracking</p>
+          <div class="row-with-note"><span class="note bad">A03 — hand-rolled FilterMultiSelect row, no useQueryFilters</span></div>
+          <div style="padding:14px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;margin-bottom:14px;">
+            <div style="display:flex;gap:10px;align-items:flex-end;font-size:11px;flex-wrap:wrap;">
+              <div>
+                <div style="font-size:10px;color:#64748B;font-weight:500;margin-bottom:3px;">Team</div>
+                <div style="padding:5px 9px;border:1px solid #E2E8F0;border-radius:6px;width:200px;color:#94A3B8;background:#fff;">All Teams</div>
+              </div>
+              <div>
+                <div style="font-size:10px;color:#64748B;font-weight:500;margin-bottom:3px;">Employee</div>
+                <div style="padding:5px 9px;border:1px solid #E2E8F0;border-radius:6px;width:200px;color:#94A3B8;background:#fff;">All Employees</div>
+              </div>
+            </div>
           </div>
-          <div class="row-with-note"><span class="note bad">A12 — light-only KPI cards</span></div>
+          <div class="row-with-note"><span class="note bad">A12 — light-only KPI cards</span><span class="note bad">A11 — no tabular-nums</span></div>
           <div class="pm-grid">
             <div class="pm-card"><div class="pm-card-h">Active</div><div class="pm-card-v">147</div><div class="pm-card-d">+3 this week</div></div>
             <div class="pm-card"><div class="pm-card-h">At risk</div><div class="pm-card-v">12</div><div class="pm-card-d">2 escalations open</div></div>
             <div class="pm-card"><div class="pm-card-h">Churned (30d)</div><div class="pm-card-v">3</div><div class="pm-card-d">−$48k ARR</div></div>
           </div>
-          <div class="row-with-note"><span class="note bad">A14 — table, no overflow wrapper</span></div>
+          <div class="row-with-note"><span class="note bad">A14 — no overflow wrapper</span><span class="note bad">A02 — status chip uses className override, not Badge tone</span></div>
           <div class="pm-table">
             <div class="pm-table-row head"><div>Organisation</div><div>Owner</div><div>Tier</div><div>Health</div><div>Last touch</div></div>
-            <div class="pm-table-row"><div>Acme Commerce Co</div><div>ani@</div><div>Tier 1</div><div><span class="pm-chip complete">healthy</span></div><div>2d ago</div></div>
-            <div class="pm-table-row"><div>Kwontified Retail</div><div>kev@</div><div>Tier 2</div><div><span class="pm-chip warning">at risk</span></div><div>9d ago</div></div>
-            <div class="pm-table-row"><div>Northwind Brands</div><div>ani@</div><div>Tier 1</div><div><span class="pm-chip complete">healthy</span></div><div>5d ago</div></div>
+            <div class="pm-table-row"><div>Acme Commerce Co</div><div>ani@</div><div>Tier 1</div><div><span class="pm-chip" style="background:#DCFCE7;color:#15803D;border:1px solid #BBF7D0;">healthy</span></div><div>2d ago</div></div>
+            <div class="pm-table-row"><div>Kwontified Retail</div><div>kev@</div><div>Tier 2</div><div><span class="pm-chip" style="background:#FFEDD5;color:#9A3412;border:1px solid #FED7AA;">at risk</span></div><div>9d ago</div></div>
+            <div class="pm-table-row"><div>Northwind Brands</div><div>ani@</div><div>Tier 1</div><div><span class="pm-chip" style="background:#DCFCE7;color:#15803D;border:1px solid #BBF7D0;">healthy</span></div><div>5d ago</div></div>
           </div>
         </div>
       </div>
       <div class="frame good">
-        <div class="frame-tag"><span style="display:inline-block;width:8px;height:8px;border-radius:99px;background:currentColor;"></span> After <span class="meta">A03 + A05 + A12 + A14 resolved on this view</span></div>
+        <div class="frame-tag"><span style="display:inline-block;width:8px;height:8px;border-radius:99px;background:currentColor;"></span> After <span class="meta">A02 + A03 + A05 + A12 + A14 resolved</span></div>
         <div class="page-mock">
-          <div class="row-with-note"><span class="note good">A03 + A05 — PageHeader primitive</span></div>
+          <div class="row-with-note"><span class="note good">A03 + A05 — &lt;PageHeader title=…&gt;</span></div>
           <h1 class="pm-h1 fixed">Clients</h1>
-          <p class="pm-sub">Browse organizations and their meeting / ticket activity</p>
+          <p class="pm-sub">Client health overview and relationship tracking</p>
           <div style="height:1px;background:#E2E8F0;margin:6px 0 12px;"></div>
           <div class="row-with-note"><span class="note good">A03 — useQueryFilters hook</span></div>
           <div class="pm-toolbar">
             <input class="pm-search" placeholder="Search clients…" />
-            <span class="pm-chip canonical">segment: any</span>
-            <span class="pm-chip canonical">tier: any</span>
-            <button class="pm-btn primary">+ Add client</button>
+            <span class="pm-chip canonical">team: any</span>
+            <span class="pm-chip canonical">employee: any</span>
+            <button class="pm-btn primary" style="margin-left:auto;">+ Add client</button>
           </div>
-          <div class="row-with-note"><span class="note good">A12 — tone variants flip on theme</span></div>
+          <div class="row-with-note"><span class="note good">A12 — Badge tone flips per theme</span><span class="note good">A11 — tabular-nums</span></div>
           <div class="pm-grid">
             <div class="pm-card fixed"><div class="pm-card-h">Active</div><div class="pm-card-v" style="font-variant-numeric:tabular-nums;">147</div><div class="pm-card-d">+3 this week</div></div>
             <div class="pm-card fixed"><div class="pm-card-h">At risk</div><div class="pm-card-v" style="font-variant-numeric:tabular-nums;">12</div><div class="pm-card-d">2 escalations open</div></div>
             <div class="pm-card fixed"><div class="pm-card-h">Churned (30d)</div><div class="pm-card-v" style="font-variant-numeric:tabular-nums;">3</div><div class="pm-card-d">−$48k ARR</div></div>
           </div>
-          <div class="row-with-note"><span class="note good">A14 — overflow-x + column-hide on md</span></div>
+          <div class="row-with-note"><span class="note good">A14 — overflow-x · column-hide on md</span><span class="note good">A02 — &lt;Badge tone="success"/&gt;</span></div>
           <div class="pm-table fixed">
             <div class="pm-table-row head"><div>Organisation</div><div>Owner</div><div>Tier</div><div>Health</div><div>Last touch</div></div>
             <div class="pm-table-row"><div>Acme Commerce Co</div><div>ani@</div><div>Tier 1</div><div><span class="pm-chip complete">healthy</span></div><div>2d ago</div></div>
@@ -614,6 +773,17 @@ console.<span class="raw">log</span>(<span class="raw">"Migration SQL:"</span>, 
       </div>
     </div>
   </div>
+
+  <h2 class="section-title">Step 7 · suggested execution order</h2>
+  <ol style="font-size:13px;line-height:1.7;padding-left:22px;">
+    <li><strong>Add <code>&lt;PageHeader&gt;</code> + <code>useQueryFilters</code></strong> (A03). Both primitives are missing entirely; this is the highest-leverage change in the audit.</li>
+    <li><strong>Finish PR&nbsp;#94 sweep</strong> (A02): 7 named sites — feedback-button, mixpanel-settings, roadmap-detail, trigger-analysis-button, clients/[id] — onto <code>Badge tone</code>.</li>
+    <li><strong>Promote <code>Skeleton</code> over the 10 hand-rolled pulse blocks</strong> (A09) in integrations-landing + mixpanel-settings.</li>
+    <li><strong>aria-label sweep on icon-only buttons</strong> (A08); add <code>motion-reduce:hidden</code> to the 22 <code>animate-spin</code> sites.</li>
+    <li><strong>Wrap the 12 unwrapped tables in <code>overflow-x-auto</code></strong> (A14) and add <code>hidden md:table-cell</code> to deprioritised columns.</li>
+    <li><strong>Replace <code>console.log</code> at integrations-landing.tsx:163</strong> (A13) with the toast.action SQL-preview affordance.</li>
+    <li><strong>Decide on <code>avatar.tsx</code></strong>: adopt at the 3-4 obvious sites (meeting participants, client owner, employee uberview) or delete.</li>
+  </ol>
 
   <div class="footer-note">
     <div>Audit produced by the <a href="https://github.com/sumedh-png/style-drift">style-drift</a> Claude Code skill. Read-only — no source files were modified.</div>
