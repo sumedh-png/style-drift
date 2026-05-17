@@ -1,0 +1,341 @@
+<!doctype html>
+<!--
+  style-drift visual-preview scaffold
+  ──────────────────────────────────────────────────────────────────────────
+  PURPOSE
+    Copy to <repo-root>/style-drift-preview.html, then customise:
+      1. Replace placeholders marked  ⟪ ⟫
+      2. Drop in a realistic mock of the worst-offending page
+      3. Mirror BEFORE → AFTER node-for-node (same DOM tree, scoped styles
+         under .before-side / .after-side decide the visual diff)
+      4. Add a `.note.bad` annotation above each drifty section in BEFORE
+         and a `.note.good` annotation above the same section in AFTER
+      5. Fill in the summary table at the bottom
+
+  LAYOUT RULES (don't skip — every one of these fixes a real bug)
+    • Side-by-side only at min-width: 1700px. Default is stacked.
+    • Every grid `1fr` column ⇒ `minmax(0, 1fr)`.
+    • Every flex/grid child whose text could overflow ⇒ `min-width: 0` +
+      `overflow:hidden; text-overflow:ellipsis; white-space:nowrap`.
+    • No `position: absolute` overlays for modals/assistants — dock them
+      inline in the right column.
+    • `flex-wrap: wrap` on toolbar action rows.
+    • Match emoji line-height to lucide SVG sizing (set `line-height: 1`
+      on emoji spans so a 18px emoji doesn't push the row taller than a
+      14px SVG in AFTER).
+
+  USER FLOW
+    After saving this file, tell the user:
+      "Preview is at <path>. Review BEFORE / AFTER side-by-side.
+       No code edited yet — confirm and I'll apply the fixes."
+    DO NOT edit any source files until the user confirms.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>⟪Page name⟫ · BEFORE / AFTER drift fixes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+/* ════════════════════════════════════════════════════════════════════════
+   DOC CHROME
+   ════════════════════════════════════════════════════════════════════════ */
+:root {
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --doc-bg: #F4F5F8;
+  --doc-fg: #0F172A;
+  --doc-fg-dim: #64748B;
+  --doc-border: #E2E8F0;
+  --bad: #DC2626; --bad-bg: #FEF2F2; --bad-border: #FECACA;
+  --good: #16A34A; --good-bg: #F0FDF4; --good-border: #BBF7D0;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--sans);
+  background: var(--doc-bg);
+  color: var(--doc-fg);
+  -webkit-font-smoothing: antialiased;
+}
+.doc { max-width: 1760px; margin: 0 auto; padding: 32px 24px 64px; }
+.doc-head { margin-bottom: 24px; border-bottom: 1px solid var(--doc-border); padding-bottom: 18px; }
+.doc-head h1 { margin: 0 0 6px; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+.doc-head .sub { color: var(--doc-fg-dim); font-size: 13px; }
+.doc-head .pill {
+  display: inline-block;
+  font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: 4px;
+  letter-spacing: 0.04em; margin-right: 8px;
+}
+.doc-head .pill.dark { background: #0F172A; color: #F1F5F9; }
+.doc-head .pill.path { background: #EEF2FF; color: #4338CA; font-family: var(--mono); }
+
+.legend {
+  margin: 18px 0 14px;
+  display: flex; gap: 14px; flex-wrap: wrap;
+  font-size: 12px; color: var(--doc-fg-dim);
+}
+.legend .item { display: inline-flex; gap: 6px; align-items: center; }
+.legend .dot {
+  width: 9px; height: 9px; border-radius: 99px;
+  background: var(--bad);
+  box-shadow: 0 0 0 3px rgba(220,38,38,0.18);
+}
+.legend .item.fixed .dot { background: var(--good); box-shadow: 0 0 0 3px rgba(22,163,74,0.18); }
+
+/* Stack vertically by default; side-by-side only on wide screens.
+   Don't change this — narrow-side overflow is the #1 cause of
+   "BEFORE is all jumbled up" complaints. */
+.split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+@media (min-width: 1700px) {
+  .split { grid-template-columns: 1fr 1fr; gap: 18px; }
+}
+
+.panel {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--doc-border);
+  background: #fff;
+}
+.panel .tab {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 8px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.panel.before .tab { background: var(--bad-bg); color: var(--bad); border-bottom: 1px solid var(--bad-border); }
+.panel.after  .tab { background: var(--good-bg); color: var(--good); border-bottom: 1px solid var(--good-border); }
+.panel .tab .meta {
+  font-weight: 500; text-transform: none;
+  color: var(--doc-fg-dim); margin-left: auto;
+  font-family: var(--mono); font-size: 10px;
+}
+.panel.before .tab .meta { color: #B91C1C; }
+.panel.after  .tab .meta { color: #15803D; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   APP FRAME — 3 columns: sidebar | content | dock
+   Replace the CSS custom properties below with the project's actual tokens.
+   ════════════════════════════════════════════════════════════════════════ */
+.app {
+  /* ⟪ Replace these with the project's Dark-theme tokens. ⟫ */
+  --bg: #0D0F12; --surface: #141720; --card: #1A1D24;
+  --border: #252832; --border2: #2E3340;
+  --text: #F0F2F7; --text2: #C8CCDA; --muted: #7B8099; --dim: #4A5068;
+  --accent: #6366F1; --accentL: #818CF8;
+  --green: #22C55E; --red: #F87171; --orange: #FB923C; --yellow: #EAB308;
+  --sidebarBg: #090B0E;
+
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr) 240px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+}
+.sb {
+  background: var(--sidebarBg);
+  border-right: 1px solid var(--border);
+  padding: 14px 10px;
+  color: var(--text2);
+  font-size: 11.5px;
+  min-height: 100%;
+}
+.content {
+  padding: 16px 16px 18px;
+  display: flex; flex-direction: column; gap: 12px;
+  min-width: 0;
+}
+.content-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.content-head h2 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+.content-head .sub { color: var(--muted); font-size: 11px; }
+.content-head .actions { margin-left: auto; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.dock {
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  padding: 14px 12px;
+  display: flex; flex-direction: column; gap: 12px;
+  min-height: 100%;
+}
+
+/* In-content section header */
+.section-h {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--muted);
+}
+.section-h .ct {
+  font-size: 9px; padding: 1px 6px; border-radius: 99px;
+  background: rgba(255,255,255,0.06); color: var(--text2);
+}
+
+/* Drift annotation note (above each section) */
+.note {
+  font-size: 10px;
+  font-family: var(--mono);
+  padding: 1px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  display: inline-block;
+}
+.note.bad  { background: var(--bad-bg);  color: #B91C1C; border: 1px solid var(--bad-border); }
+.note.good { background: var(--good-bg); color: #15803D; border: 1px solid var(--good-border); }
+.row-with-note { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+.row-with-note .note { font-size: 9px; }
+
+/* Lucide-style inline-SVG icon helper (use for AFTER side) */
+.lucide {
+  width: 1em; height: 1em;
+  stroke: currentColor; fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  display: inline-block;
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   BEFORE styles — scoped to .before-side
+   ⟪ Add per-component drift styles here. Examples:
+        .before-side .kpi { border-radius: 6px; ... }
+        .before-side .raw-btn { background: #6366f1; ... }   // lowercase hex
+        .before-side .sdot.green { background: #10B981; }
+        .before-side .sdot.green2 { background: #22c55e; }   // same status, drift
+   ⟫
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════════════════
+   AFTER styles — scoped to .after-side
+   ⟪ Mirror each BEFORE component, but using canonical tokens / primitives:
+        .after-side .kpi { border-radius: 10px; ... }
+        .after-side .Btn { ... canonical primitive ... }
+        .after-side .StatusDot.healthy { background: var(--green); ... }
+   ⟫
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════════════════
+   Summary table
+   ════════════════════════════════════════════════════════════════════════ */
+.summary-table { margin-top: 24px; width: 100%; border-collapse: collapse; font-size: 12px; }
+.summary-table th, .summary-table td {
+  text-align: left; padding: 8px 12px;
+  border-bottom: 1px solid var(--doc-border);
+  vertical-align: top;
+}
+.summary-table th {
+  background: #FAFBFC; font-weight: 600;
+  font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--doc-fg-dim);
+}
+.summary-table .bad  { color: #B91C1C; font-family: var(--mono); font-size: 11px; }
+.summary-table .good { color: #15803D; font-family: var(--mono); font-size: 11px; font-weight: 600; }
+.summary-table .delta { color: #15803D; font-weight: 700; font-size: 11px; }
+
+.footer-note {
+  margin-top: 28px; padding-top: 18px;
+  border-top: 1px solid var(--doc-border);
+  font-size: 12px; color: var(--doc-fg-dim);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+}
+</style>
+</head>
+<body>
+<div class="doc">
+  <header class="doc-head">
+    <h1>⟪Page name⟫ — BEFORE / AFTER style-drift fixes</h1>
+    <div class="sub">
+      <span class="pill path">⟪frontend/path/to/file.tsx⟫</span>
+      <span class="pill dark">⟪Theme: Dark⟫</span>
+      Preview of proposed visual changes. <strong>No code has been edited yet</strong> — review side-by-side and confirm before applying fixes.
+    </div>
+  </header>
+
+  <div class="legend">
+    <span class="item"><span class="dot"></span>Drift in BEFORE</span>
+    <span class="item fixed"><span class="dot"></span>Resolved in AFTER</span>
+  </div>
+
+  <div class="split">
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         BEFORE
+         ════════════════════════════════════════════════════════════════════ -->
+    <div class="panel before">
+      <div class="tab">
+        Before
+        <span class="meta">⟪N drift signals in this view⟫</span>
+      </div>
+      <div class="app before-side">
+        <aside class="sb">
+          <!-- ⟪ Sidebar markup — usually identical between BEFORE and AFTER ⟫ -->
+        </aside>
+        <div class="content">
+          <!-- ⟪ Page header + main sections with `.note.bad` annotations above each drifty section ⟫ -->
+        </div>
+        <aside class="dock">
+          <!-- ⟪ Right dock: assistant, confirm modal sample, "what's changed" — render inline, NOT absolutely positioned ⟫ -->
+        </aside>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         AFTER
+         ════════════════════════════════════════════════════════════════════ -->
+    <div class="panel after">
+      <div class="tab">
+        After
+        <span class="meta">0 drift signals — primitives + tokens only</span>
+      </div>
+      <div class="app after-side">
+        <aside class="sb">
+          <!-- ⟪ Same sidebar markup as BEFORE ⟫ -->
+        </aside>
+        <div class="content">
+          <!-- ⟪ Same sections as BEFORE, with canonical primitives + tokens; `.note.good` annotations above each fixed section ⟫ -->
+        </div>
+        <aside class="dock">
+          <!-- ⟪ Same dock as BEFORE, but rendered using canonical primitives ⟫ -->
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th style="width: 5%;">#</th>
+        <th style="width: 22%;">Drift signal</th>
+        <th style="width: 26%;">Before (in this view)</th>
+        <th style="width: 26%;">After (in this view)</th>
+        <th style="width: 21%;">Δ (codebase-wide)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ⟪ One row per FIX-N. Examples:
+      <tr>
+        <td>01</td>
+        <td>Skeleton primitive</td>
+        <td class="bad">.wz-skeleton class undefined → invisible</td>
+        <td class="good">Defined, shimmers</td>
+        <td class="delta">+1 working primitive</td>
+      </tr>
+      ⟫ -->
+    </tbody>
+  </table>
+
+  <div class="footer-note">
+    <div>
+      Both panels render the same layout with the same mock data — drift lives entirely in the styling.
+      Open at typical desktop widths; side-by-side at &ge;1700px, stacked below that.
+    </div>
+    <div style="font-family:var(--mono);">
+      <code>style-drift-preview.html</code>
+    </div>
+  </div>
+</div>
+</body>
+</html>
