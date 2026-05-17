@@ -117,6 +117,8 @@ For any other stack, skip Step 1 and go straight to Step 2.
 
 For each of the 14 axes, run **the recipe block whose stack matches recon**. These are read-only greps — no side effects. Parallelise: run all recipes in a single message with multiple Bash tool calls.
 
+**Greps surface volume. They do not produce an audit.** Treat the grep output as a list of *suspects to investigate*, not as the finding itself. Step 2b (mandatory) converts grep counts into named-component diagnoses.
+
 Each axis block below has:
 - **Intent** — what the axis measures (stack-agnostic)
 - **Recipes** — concrete greps grouped by stack family (run the rows that match recon)
@@ -206,7 +208,14 @@ grep -roE '(text|bg|border|divide|ring)-(gray|zinc|neutral|stone)-[0-9]+' --incl
 
 # Inline-style — hex/rgb literals vs token references:
 grep -oE '#[0-9a-fA-F]{6}\b' "$LARGEST" | sort | uniq -c | sort -rn | head -20
-grep -oE 'T\.[a-zA-Z]+' "$LARGEST" | wc -l   # or theme.* / palette.* / tokens.* — substitute the project's accessor
+grep -oE 'T\.[a-zA-Z][a-zA-Z0-9.]*' "$LARGEST" | wc -l   # or theme.* / palette.* / tokens.* — substitute the project's accessor; allow dotted paths
+
+# Case-mixed duplicates (smoking gun for "format jitter, not intent"):
+#   Same color appearing in upper- and lower-case form (#F59E0B and #f59e0b) means
+#   contributors typed hex by hand. Lowercase the output and re-uniq — the count
+#   drop is the duplication signal.
+grep -oE '#[0-9a-fA-F]{6}\b' "$LARGEST" | tr 'A-F' 'a-f' | sort -u | wc -l   # distinct colors when normalised
+grep -oE '#[0-9a-fA-F]{6}\b' "$LARGEST" | sort -u | wc -l                    # distinct as-typed
 
 # CSS Modules — hex in module files (excluding token files):
 grep -rnE '#[0-9a-fA-F]{6}' --include="*.module.css" src/ | grep -v 'tokens\|theme\|variables'
@@ -236,9 +245,12 @@ grep -rEn '<h1\s' --include="*.tsx" --include="*.vue" --include="*.svelte" app/ 
 for f in $(find app -name "page.tsx"); do c=$(grep -c "<h1" "$f"); [ "$c" -gt 1 ] && echo "$c h1s · $f"; done
 grep -rEh 'uppercase tracking-wid' --include="*.tsx" app/ | sed -E 's/.*className="([^"]+)".*/\1/' | sort -u
 
-# Inline-style + monolith — fontSize ladder spread:
-grep -oE 'fontSize:\s*[0-9]+' "$LARGEST" | sort | uniq -c | sort -rn | head -15
+# Inline-style + monolith — fontSize ladder spread (catches decimals like 10.5):
+grep -oE 'fontSize:\s*[0-9.]+' "$LARGEST" | sort | uniq -c | sort -rn | head -25
 grep -cE '<h[1-6]\b' "$LARGEST"   # 0 = no semantic headings = Major
+
+# letterSpacing format jitter — same intent, different syntax:
+grep -oE 'letterSpacing:\s*"\.?0?\.0[0-9]em"' "$LARGEST" | sort | uniq -c | sort -rn
 
 # RN — heading semantics:
 grep -rnE 'accessibilityRole="header"' --include="*.tsx" src/ | wc -l
@@ -469,6 +481,41 @@ grep -rcE 'ListView\.builder|GridView\.builder|DataTable\(' --include="*.dart" l
 
 ---
 
+### Step 2b · Read the suspects (mandatory)
+
+Greps tell you the *volume* of drift. They don't tell you *which named component* is broken, whether a primitive is **defined but never called**, whether `className="wz-skeleton"` resolves to a CSS rule that doesn't exist, or whether a second `THEMES` constant lives in an `ErrorBoundary` fallback. **That requires opening files and reading them.**
+
+For each axis where greps surfaced a non-trivial count, open the top 1–2 suspect files (and the canonical primitive's own definition file when relevant). For inline-style monoliths, jump into the largest file at the regions the greps matched and read ±50 lines of context. The deliverable per non-OK axis is a **named-component finding** — a specific component, function, or line range, not just an aggregate count.
+
+**The "named-component finding" rule.** When an axis is Major or Significant, the catalog's *Headline finding* and the per-axis card's *Evidence* must reference at least one named component / function / line range. *"35 files have raw hex"* without a named diagnosis is Minor, not Significant. If you can't name a specific drift site, drop the severity or change your status.
+
+**Smoking guns to look for** (stack-agnostic — translate to the audited stack's idioms; not all will apply to every project):
+
+1. **Broken class / token references.** A `className=` / `style={ x }` that names something *undefined elsewhere*. Cross-reference the class or token name against the global CSS / theme module; if absent, the primitive renders as 0 visible pixels and the supposed "adoption count" is fiction.
+   - Recipe: pick the primitive's CSS class from its source (`grep "className=" Skeleton.tsx`), then grep the whole tree for a matching CSS rule (`grep -r "\.wz-skeleton" --include="*.css"`). 0 hits → broken.
+2. **Defined-but-unused primitives.** A component / hook / modal declared and exported but never imported anywhere. The audit reads as "primitive exists" but call sites bypass it because it doesn't actually work.
+   - Recipe: for each primitive in the UI directory, `grep -rln "from .*/Component" --include="*.tsx" --include="*.vue" | wc -l`. 0 = unused.
+3. **Parallel theme / token systems.** A second `THEMES`-like constant declared *outside* the canonical theme module — e.g. `WIZI_THEMES`, `MOBILE_THEMES`, `LEGACY_PALETTE`, `EMBED_COLORS`. Indicates the design system was forked rather than extended for a subtree (chat assistant, embed mode, marketing pages, mobile).
+   - Recipe: `grep -rnE "(const|export const)\s+[A-Z_]+_?THEMES?\s*=" --include="*.{ts,tsx,js,jsx}" src/`
+4. **Inlined copies of canonical constants.** A hand-typed `const T = { accent: "#xxx", text: "#xxx", … }` sitting in an `ErrorBoundary`, fallback path, test fixture, or pre-React-mount bootstrap. Silently drifts the day the canonical changes.
+   - Recipe: grep for hex literal patterns near the names of canonical token keys (e.g. `accent:`, `surface:`, `card:`) and check whether they're inside `THEMES` itself or somewhere else.
+5. **Multiple ternaries reimplementing the same lookup.** Five different `(s === "critical" ? "..." : s === "high" ? "..." : ...)` blocks across files where a shared `SEVERITY_TOKENS` map should exist. Each tends to drift slightly.
+   - Recipe: `grep -rnE '\?\s*"[^"]*"\s*:\s*[^?]+\?\s*"[^"]*"\s*:' --include="*.tsx" src/ | wc -l` (ternary nesting count, sample and read).
+6. **Native browser dialogs bypassing custom modals.** `window.confirm`, `window.alert`, `window.prompt` in a codebase that defines `<ConfirmModal>` / `<AlertModal>`.
+   - Recipe: `grep -rnE 'window\.(confirm|alert|prompt)\(' --include="*.{ts,tsx,js,jsx}" src/`
+7. **Hex case duplicates.** Same color used in both upper- and lower-case form (`#F59E0B` and `#f59e0b` appearing as separate sort buckets) — format jitter, not intent. Compare the as-typed distinct count to the case-normalised distinct count.
+8. **Numeric scale jitter.** `borderRadius: 5/6/7/8/9/10` for the same logical "small surface", or `fontSize: 10/10.5/11/12/12.5/13` for body text. **Non-integer values (10.5, 12.5) are an especially loud smoking gun** — nobody designs a system around 10.5px on purpose.
+9. **Format jitter on the same property.** `letterSpacing` written as `.05em` / `0.05em` / `.06em` / `0.06em` for the same visual intent; `padding: "6px 12px"` vs `padding: 6 12` vs `paddingX: 12; paddingY: 6` for the same control.
+10. **Component-name shadowing.** A `<Button>` declared in `pages/Foo.tsx` *as well as* `components/ui/Button.tsx`, and they don't agree. Same for `<Card>`, `<Modal>`, `<Section>`. Greppable as `grep -rnE '^(const|function)\s+(Btn|Button|Card|Section|Modal)\b'`.
+11. **Per-file fmt helpers.** `const formatPercent = …` reimplemented across 3+ files instead of imported from a shared lib. Each has a slightly different rounding rule.
+12. **Icon-only controls without label.** `<button>` containing only `<Icon/>`, no `aria-label`. Greppable via context lines on `<Loader2|X|ChevronDown|Trash|Plus`.
+13. **Animation without motion gate.** Every `transition:` / `animation:` site, and no file mentions `prefers-reduced-motion`. The greps in A09 surface this; reading suspects confirms whether a wrapper hook exists.
+14. **Stale escape hatches with rotten reasons.** `as any` with a `// FIXME: remove after v3` comment from 18 months ago; `@ts-ignore` clusters that survived the package upgrade they were waiting on.
+
+When suspects don't reveal a named finding, **lower the severity** for that axis. The catalog's Volume column is what greps produce; the Headline finding column is what reading produces.
+
+This step typically takes longer than the greps. Don't skip it — the named-component findings are what make the audit actionable.
+
 ### Step 3 · Capture snapshots (optional, for tracking progress)
 
 ```bash
@@ -482,7 +529,7 @@ grep -rcE 'ListView\.builder|GridView\.builder|DataTable\(' --include="*.dart" l
 
 ### Step 4 · Interpret + categorise per axis
 
-For each axis, decide a status using the rules below — but **apply the Step-0 recon-driven status adjustments first**:
+For each axis, decide a status using the rules below — but **apply the Step-0 recon-driven status adjustments first**, and apply the **named-finding requirement** from Step 2b: an axis can only be Major/Significant if Step 2b found a specific drift site worth naming. Otherwise drop to Minor.
 
 - 🔴 **Major** — primitive/pattern doesn't exist at the project level and many call sites reimplement it; OR a semantic / a11y violation affects the whole app
 - 🟠 **Significant** — primitive exists but ~30%+ of call sites bypass it; OR a token gap forces frequent overrides
@@ -492,7 +539,9 @@ For each axis, decide a status using the rules below — but **apply the Step-0 
 
 ### Step 5 · Build the axis catalog table
 
-Lead the report with one table. **Always 14 rows.** Even on stacks where an axis doesn't apply, render it with status `OK · N/A` and one-line justification:
+Lead the report with one table. **Always 14 rows — no exceptions.** Every axis A01–A14 must appear in the catalog, in order, even if an axis doesn't apply to this stack (render as `OK · N/A` with one-line justification). Don't drop, merge, or rename axes; the spine of the report is the catalog itself, and a missing row tells the reader nothing was checked.
+
+The **Headline finding** column must reference a named component / function / line range when status is Major or Significant. Aggregate-only descriptions ("35 files have raw hex") indicate the read-the-suspects step (Step 2b) was skipped — go back and do it.
 
 ```
 | Axis | Name                       | Status      | Headline finding                                | Volume                          |
@@ -509,12 +558,13 @@ The preview file at `<root>/style-drift-preview.html` must contain:
 1. **Doc header** — title, root path, **recon pills** (stack, framework, styling, tokens, tree, primitives — verbatim from recon JSON), KPI chip row (1 chip per Major/Significant axis)
 2. **Axis catalog** — the same table from Step 5, rendered as HTML
 3. **Legend** — red dot = drift in BEFORE, green dot = resolved in AFTER
-4. **Section 1 · Axes in detail** — one `axis-card` per axis. Each card:
+4. **Section 1 · Axes in detail** — one `axis-card` per axis (14 cards minimum). Each card:
    - Numbered header (A01, A02, …) + axis name + status pill + scope line
-   - Evidence block: the raw counts / file:line citations that justify the status (must reflect the recipe family chosen by recon — don't paste Tailwind syntax in an inline-style audit)
-   - BEFORE / AFTER side-by-side — small live demo + code snippet **in the syntax of the audited stack**
+   - Evidence block: for Major/Significant axes, **at least one named-component finding** (component / function name + line range), plus the supporting aggregate counts. Pure-count evidence (no named site) means the read-the-suspects step was skipped — fix the audit, not the card.
+   - File:line citations must point to real code paths from the audited tree, in the audit's actual syntax (don't paste Tailwind className examples in an inline-style audit).
+   - BEFORE / AFTER side-by-side — small live demo + code snippet **in the syntax of the audited stack**, mirroring the named-component finding when possible (don't draw a generic chip if the finding is "`RootCauseChainBanner` ignores its `T` prop" — render that banner).
    - Footer with `Δ` (codebase-wide delta the fix produces)
-   - For OK / OK · N/A axes, render a single explanatory panel instead of a BEFORE/AFTER pair
+   - For OK / OK · N/A axes, render a single explanatory panel instead of a BEFORE/AFTER pair. Multiple OK axes may be batched into one card to save space, but each axis's status pill must still appear somewhere visible.
 5. **Section 2 · Page (or screen) in context** — full BEFORE/AFTER mock of the worst-drift page/screen, with `A0N` notes above each drifty section so the reader can trace each visual change back to its axis
 6. **Footer note** — summary, file path
 
