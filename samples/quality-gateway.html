@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Quality Gateway — style-drift audit (14 axes)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+:root {
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --doc-bg: #F4F5F8;
+  --doc-fg: #0F172A;
+  --doc-fg-dim: #64748B;
+  --doc-border: #E2E8F0;
+  --bad: #DC2626; --bad-bg: #FEF2F2; --bad-border: #FECACA;
+  --good: #16A34A; --good-bg: #F0FDF4; --good-border: #BBF7D0;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--doc-bg); color: var(--doc-fg); -webkit-font-smoothing: antialiased; }
+.doc { max-width: 1320px; margin: 0 auto; padding: 32px 24px 64px; }
+.doc-head { margin-bottom: 22px; border-bottom: 1px solid var(--doc-border); padding-bottom: 18px; }
+.doc-head h1 { margin: 0 0 6px; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+.doc-head .sub { color: var(--doc-fg-dim); font-size: 13px; line-height: 1.6; }
+.pill { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 4px; letter-spacing: 0.04em; margin: 0 4px 4px 0; vertical-align: middle; }
+.pill.path { background: #EEF2FF; color: #4338CA; font-family: var(--mono); font-weight: 500; }
+.pill.recon { background: #0F172A; color: #F1F5F9; font-weight: 600; }
+.pill.recon b { color: #94A3B8; font-weight: 400; margin-right: 4px; }
+.pill.recon span { color: #F1F5F9; }
+.recon-row { margin-top: 10px; line-height: 2; }
+.kpi-row { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+.kpi { background: #fff; border: 1px solid var(--doc-border); border-radius: 8px; padding: 8px 12px; font-size: 12px; display: flex; flex-direction: column; gap: 2px; min-width: 130px; }
+.kpi .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--doc-fg-dim); font-weight: 600; }
+.kpi .val { font-size: 18px; font-weight: 700; color: var(--doc-fg); font-family: var(--mono); line-height: 1; }
+.kpi.major .val { color: #B91C1C; }
+.kpi.sig .val { color: #C2410C; }
+.kpi.min .val { color: #B45309; }
+.kpi.ok .val { color: #16A34A; }
+h2.section-title { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 28px 0 10px; padding-top: 14px; border-top: 1px solid var(--doc-border); }
+h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 13px; margin-left: 8px; }
+.catalog { width: 100%; border-collapse: collapse; font-size: 12.5px; background: #fff; border: 1px solid var(--doc-border); border-radius: 10px; overflow: hidden; }
+.catalog th, .catalog td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--doc-border); vertical-align: top; }
+.catalog tr:last-child td { border-bottom: none; }
+.catalog th { background: #FAFBFC; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--doc-fg-dim); }
+.catalog td.id { font-family: var(--mono); color: var(--doc-fg-dim); width: 42px; font-weight: 600; }
+.catalog td.name { width: 22%; font-weight: 600; }
+.catalog td.vol { font-family: var(--mono); font-size: 11.5px; color: var(--doc-fg-dim); width: 22%; }
+.status { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.02em; white-space: nowrap; }
+.status.major       { background: #FEF2F2; color: #B91C1C; }
+.status.significant { background: #FFF7ED; color: #C2410C; }
+.status.minor       { background: #FFFBEB; color: #B45309; }
+.status.ok          { background: #F0FDF4; color: #16A34A; }
+.status.na          { background: #F1F5F9; color: #64748B; }
+.legend { margin: 14px 0 4px; display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--doc-fg-dim); }
+.legend .item { display: inline-flex; gap: 6px; align-items: center; }
+.legend .dot { width: 9px; height: 9px; border-radius: 99px; background: var(--bad); box-shadow: 0 0 0 3px rgba(220,38,38,0.18); }
+.legend .item.fixed .dot { background: var(--good); box-shadow: 0 0 0 3px rgba(22,163,74,0.18); }
+.axis-card { background: #fff; border: 1px solid var(--doc-border); border-radius: 12px; padding: 18px 18px 16px; margin-top: 14px; }
+.axis-card .head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.axis-card .head .num { font-family: var(--mono); font-weight: 700; color: var(--doc-fg-dim); font-size: 12px; }
+.axis-card .head .axis-name { font-size: 14px; font-weight: 700; }
+.axis-card .head .scope { font-family: var(--mono); font-size: 11px; color: var(--doc-fg-dim); margin-left: auto; }
+.axis-card .evidence { margin-top: 12px; background: #FAFBFC; border: 1px solid var(--doc-border); border-radius: 8px; padding: 10px 12px; font-size: 12px; }
+.axis-card .evidence .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--doc-fg-dim); font-weight: 700; }
+.axis-card .evidence ul { margin: 6px 0 0; padding-left: 18px; }
+.axis-card .evidence li { margin-bottom: 2px; font-family: var(--mono); font-size: 11.5px; color: #1E293B; }
+.axis-card .evidence .citation { color: var(--doc-fg-dim); }
+.axis-card .pair { margin-top: 12px; display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 1100px) { .axis-card .pair { grid-template-columns: 1fr 1fr; gap: 14px; } }
+.axis-card .b, .axis-card .a { border: 1px solid var(--doc-border); border-radius: 8px; overflow: hidden; min-width: 0; }
+.axis-card .tag { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 12px; display: flex; align-items: center; gap: 8px; }
+.axis-card .b .tag { background: var(--bad-bg); color: var(--bad); border-bottom: 1px solid var(--bad-border); }
+.axis-card .a .tag { background: var(--good-bg); color: var(--good); border-bottom: 1px solid var(--good-border); }
+.axis-card .tag .dot { width: 8px; height: 8px; border-radius: 99px; background: currentColor; }
+.axis-card .demo { padding: 14px; background: #fff; min-height: 60px; }
+.axis-card .code { font-family: var(--mono); font-size: 11px; line-height: 1.55; background: #0F172A; color: #E2E8F0; padding: 10px 12px; overflow-x: auto; white-space: pre; }
+.axis-card .code .raw { color: #FCA5A5; }
+.axis-card .code .tok { color: #86EFAC; }
+.axis-card .code .cmt { color: #64748B; font-style: italic; }
+.axis-card .delta-row { margin-top: 10px; font-size: 11px; font-family: var(--mono); color: var(--good); font-weight: 600; }
+.axis-card.ok-card .single { margin-top: 10px; padding: 12px 14px; background: var(--good-bg); border: 1px solid var(--good-border); border-radius: 8px; font-size: 12px; color: #14532D; line-height: 1.5; }
+.axis-card.na-card .single { margin-top: 10px; padding: 12px 14px; background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 12px; color: #475569; line-height: 1.5; }
+
+.context-wrap { background: #fff; border: 1px solid var(--doc-border); border-radius: 12px; padding: 16px; margin-top: 16px; }
+.context-pair { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 1200px) { .context-pair { grid-template-columns: 1fr 1fr; } }
+.frame { border: 1px solid var(--doc-border); border-radius: 10px; overflow: hidden; background: #fff; min-width: 0; }
+.frame .frame-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 7px 12px; display: flex; gap: 8px; align-items: center; }
+.frame.bad .frame-tag { background: var(--bad-bg); color: var(--bad); border-bottom: 1px solid var(--bad-border); }
+.frame.good .frame-tag { background: var(--good-bg); color: var(--good); border-bottom: 1px solid var(--good-border); }
+.frame .frame-tag .meta { margin-left: auto; font-family: var(--mono); font-size: 10px; font-weight: 500; text-transform: none; letter-spacing: 0; }
+.page-mock { background: #FAFAFB; padding: 14px 14px 16px; min-height: 540px; }
+.page-mock .row-with-note { display: flex; align-items: center; gap: 8px; margin: 8px 0 6px; flex-wrap: wrap; }
+.note { font-size: 10px; font-family: var(--mono); padding: 1px 7px; border-radius: 4px; letter-spacing: 0.02em; display: inline-block; }
+.note.bad  { background: var(--bad-bg);  color: #B91C1C; border: 1px solid var(--bad-border); }
+.note.good { background: var(--good-bg); color: #15803D; border: 1px solid var(--good-border); }
+.pm-h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+.pm-h1.drift { font-weight: 700; color: #1F2937; }
+.pm-h1.fixed { font-weight: 600; }
+.pm-sub { font-size: 12px; color: var(--doc-fg-dim); margin: 4px 0 14px; }
+.pm-toolbar { display: flex; gap: 8px; margin: 8px 0 12px; flex-wrap: wrap; }
+.pm-btn { font-size: 12px; padding: 5px 11px; border-radius: 6px; border: 1px solid var(--doc-border); background: #fff; cursor: pointer; }
+.pm-btn.primary { background: #0F172A; color: #fff; border-color: #0F172A; }
+.pm-chip { font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 4px; display: inline-block; }
+.pm-chip.success { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+.pm-chip.error   { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
+.pm-chip.warning { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
+.pm-chip.info    { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.pm-spinner { display: inline-block; width: 11px; height: 11px; border: 2px solid #CBD5E1; border-top-color: #0F172A; border-radius: 99px; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.pm-table { background: #fff; border: 1px solid var(--doc-border); border-radius: 8px; overflow: hidden; }
+.pm-table.fixed { border-radius: 12px; }
+.pm-table-row { display: grid; grid-template-columns: 0.7fr 1.4fr 1fr 0.9fr 0.7fr; gap: 8px; padding: 8px 12px; font-size: 11.5px; border-bottom: 1px solid var(--doc-border); align-items: center; }
+.pm-table-row:last-child { border-bottom: none; }
+.pm-table-row.head { background: #FAFBFC; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--doc-fg-dim); font-weight: 700; }
+.pm-table-row.head.fixed { background: #F1F5F9; color: #475569; }
+.footer-note { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--doc-border); font-size: 12px; color: var(--doc-fg-dim); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.footer-note code { font-family: var(--mono); background: #EEF2FF; color: #4338CA; padding: 1px 6px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="doc">
+  <header class="doc-head">
+    <h1>Quality Gateway — style-drift audit across 14 axes</h1>
+    <div class="sub">
+      <span class="pill path">/Users/sumedh/Documents/intentwise-quality-gateway/frontend</span>
+      <div class="recon-row">
+        <span class="pill recon"><b>stack</b><span>web</span></span>
+        <span class="pill recon"><b>framework</b><span>react (vite)</span></span>
+        <span class="pill recon"><b>styling</b><span>tailwind</span></span>
+        <span class="pill recon"><b>tokens</b><span>tailwind-config</span></span>
+        <span class="pill recon"><b>primitives</b><span>radix</span></span>
+        <span class="pill recon"><b>tree</b><span>standard-tree</span></span>
+        <span class="pill recon"><b>files</b><span>33</span></span>
+      </div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi major"><div class="label">Major</div><div class="val">2</div></div>
+      <div class="kpi sig"><div class="label">Significant</div><div class="val">5</div></div>
+      <div class="kpi min"><div class="label">Minor</div><div class="val">4</div></div>
+      <div class="kpi ok"><div class="label">OK / OK · N/A</div><div class="val">3</div></div>
+    </div>
+  </header>
+
+  <div class="legend">
+    <span class="item"><span class="dot"></span>Drift in BEFORE</span>
+    <span class="item fixed"><span class="dot"></span>Resolved in AFTER</span>
+  </div>
+
+  <h2 class="section-title">Axis catalog <span class="sub">14 rows · status + headline finding + supporting volume</span></h2>
+  <table class="catalog">
+    <thead>
+      <tr><th>#</th><th>Axis</th><th>Status</th><th>Headline finding</th><th>Volume</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="id">A01</td><td class="name">Primitives</td><td><span class="status minor">Minor</span></td><td>Radix + small components/ dir; <code>&lt;StatusBadge&gt;</code> is a strong primitive. Inline <code>Section</code> duplicated across 3 pages.</td><td class="vol">StatusBadge: used widely · Section: 3 inline copies</td></tr>
+      <tr><td class="id">A02</td><td class="name">Library convention</td><td><span class="status minor">Minor</span></td><td>StatusBadge has a tone-keyed lookup; Pagination, ScoreCard wrap their own className recipes (no enum).</td><td class="vol">StatusBadge tone map: 10 keys (success/error/warning/info/pending/...)</td></tr>
+      <tr><td class="id">A03</td><td class="name">Application convention</td><td><span class="status minor">Minor</span></td><td>PageHeader + useQueryFilters exist and adopted on 7 of 9 pages. Alerts + Issues bypass with inline h1; <code>Section</code> primitive duplicated in QueryExplorer, Dashboard, Organizations.</td><td class="vol">PageHeader: 7 pages · useQueryFilters: 6 pages · Section: 3 inline copies</td></tr>
+      <tr><td class="id">A04</td><td class="name">Color tokens</td><td><span class="status significant">Significant</span></td><td>10 files import <code>gray-*</code> classes (82 hits). Alerts.tsx alone has 25 gray-* usages. Zinc creep on QueryExplorer + Evaluations skeleton rows.</td><td class="vol">gray-* files: 10 · total hits: 82 · zinc creep (pages): 2</td></tr>
+      <tr><td class="id">A05</td><td class="name">Typography</td><td><span class="status significant">Significant</span></td><td>20+ distinct eyebrow label className recipes — tracking-wider vs tracking-wide, text-[10px] vs text-xs, slate-500 vs slate-400. 2 inline h1s (Alerts, Issues).</td><td class="vol">eyebrow variants: ~20 · h1 variants: 2 (PageHeader-bypass)</td></tr>
+      <tr><td class="id">A06</td><td class="name">Radii</td><td><span class="status minor">Minor</span></td><td>Scale uses md / lg / xl + bare <code>rounded</code> — distribution is reasonable but no canonical "card radius" call-out (mix of lg + xl on bg-white surfaces).</td><td class="vol">md 46 · lg 45 · xl 36 · full 31 · bare 200</td></tr>
+      <tr><td class="id">A07</td><td class="name">Responsiveness · grids</td><td><span class="status significant">Significant</span></td><td>Only 9 <code>md:</code> and 7 <code>lg:</code> breakpoint hits across the entire tree — app is desktop-only by default.</td><td class="vol">md: 9 · lg: 7 · sm: 0 · xl: 0</td></tr>
+      <tr><td class="id">A08</td><td class="name">Accessibility</td><td><span class="status major">Major</span></td><td>0 aria-label, 0 aria-describedby, 0 role= across the whole tree. 3 aria-hidden. 1 sr-only. No reduced-motion gate.</td><td class="vol">aria-label files: 0 / 33 · aria-describedby: 0 · role=: 0 · sr-only: 1 · prefers-reduced-motion: 0</td></tr>
+      <tr><td class="id">A09</td><td class="name">Motion</td><td><span class="status significant">Significant</span></td><td>2 animate-spin (raw inline SVG spinners), 9 animate-pulse sites (6 outside Skeleton). No motion gate.</td><td class="vol">animate-spin: 2 · animate-pulse (outside Skeleton): 6 · motion gate: 0</td></tr>
+      <tr><td class="id">A10</td><td class="name">Forms</td><td><span class="status minor">Minor</span></td><td><code>SearchableSelect</code>, <code>MultiSelectFilter</code>, <code>PeriodSelector</code> primitives exist; raw <code>&lt;input&gt;</code> still appears in QueryExplorer.</td><td class="vol">SearchableSelect: 1 · MultiSelectFilter: 1 · raw inputs: ~6</td></tr>
+      <tr><td class="id">A11</td><td class="name">Data display</td><td><span class="status ok">OK</span></td><td>10 files use <code>tabular-nums</code> — strong adoption for a 33-file app. ScoreCard + TrendChart + Pagination all use it.</td><td class="vol">tabular-nums files: 10 / 33</td></tr>
+      <tr><td class="id">A12</td><td class="name">Dark / theme mode</td><td><span class="status major">Major</span></td><td>Zero <code>dark:</code> classes across 178 <code>bg-*</code> surface declarations. App is light-mode-only by design or by omission.</td><td class="vol">total bg-*: 178 · dark:bg-*: 0 · light-only: 178 (100%)</td></tr>
+      <tr><td class="id">A13</td><td class="name">Hygiene</td><td><span class="status ok">OK</span></td><td>Zero <code>as any</code>, zero TODO, zero FIXME, zero console.log/warn residue. Cleanest hygiene of the three audited projects.</td><td class="vol">as any: 0 · TODO: 0 · console.log/warn: 0</td></tr>
+      <tr><td class="id">A14</td><td class="name">Responsiveness · tables</td><td><span class="status significant">Significant</span></td><td>8 files render tables; 3 wrap in <code>overflow-x</code>. Alerts, Intelligence, Issues, QuestionTypes tables overflow on narrow viewports.</td><td class="vol">tables: 8 files · overflow-x: 3 · column-hiding: minimal</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-title">Section 1 · Axes in detail <span class="sub">evidence + BEFORE / AFTER for each non-OK axis</span></h2>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A04</span>
+      <span class="axis-name">Color tokens — gray vs slate drift</span>
+      <span class="status significant">Significant</span>
+      <span class="scope">src/pages/Alerts.tsx · src/pages/Issues.tsx · src/components/*</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>Toolkit-aligned codebases use <code>slate-*</code> for neutrals; <code>gray-*</code> is the Tailwind default.</li>
+        <li>Per-file gray-* counts (top 5):</li>
+        <li class="citation">  25 — src/pages/Alerts.tsx</li>
+        <li class="citation">  15 — src/pages/Issues.tsx</li>
+        <li class="citation">  12 — src/pages/QueryExplorer.tsx</li>
+        <li class="citation">  10 — src/components/SearchableSelect.tsx</li>
+        <li class="citation">   7 — src/components/Pagination.tsx</li>
+        <li>Zinc creep in pages: QueryExplorer.tsx:386, Evaluations.tsx:438 (skeleton row tds).</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · gray-* across pagination + filters</div>
+        <div class="demo">
+          <div style="display:flex;gap:6px;align-items:center;font-size:11.5px;color:#6B7280;">
+            <button style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid #E5E7EB;background:#fff;color:#4B5563;">‹</button>
+            <span style="color:#6B7280;">Page 1 of 12</span>
+            <button style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid #E5E7EB;background:#fff;color:#4B5563;">›</button>
+          </div>
+        </div>
+<div class="code"><span class="cmt">// Pagination.tsx · L16-52</span>
+&lt;<span class="raw">span</span> className=<span class="raw">"text-gray-500"</span>&gt;No matching rows&lt;/<span class="raw">span</span>&gt;
+&lt;<span class="raw">button</span> className=<span class="raw">"border-gray-200 hover:bg-gray-50"</span>&gt;…&lt;/<span class="raw">button</span>&gt;</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · slate-* canonical</div>
+        <div class="demo">
+          <div style="display:flex;gap:6px;align-items:center;font-size:11.5px;color:#64748B;">
+            <button style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid #E2E8F0;background:#fff;color:#475569;">‹</button>
+            <span style="color:#64748B;">Page 1 of 12</span>
+            <button style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid #E2E8F0;background:#fff;color:#475569;">›</button>
+          </div>
+        </div>
+<div class="code">&lt;<span class="tok">span</span> className=<span class="tok">"text-slate-500"</span>&gt;No matching rows&lt;/<span class="tok">span</span>&gt;
+&lt;<span class="tok">button</span> className=<span class="tok">"border-slate-200 hover:bg-slate-50"</span>&gt;…&lt;/<span class="tok">button</span>&gt;</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ −82 gray-* hits across 10 files → +0 primitives (mechanical codemod)</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A05</span>
+      <span class="axis-name">Typography — eyebrow label drift</span>
+      <span class="status significant">Significant</span>
+      <span class="scope">src/pages/* · src/components/*</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>20+ distinct className recipes for "uppercase eyebrow label" — sample selection:</li>
+        <li class="citation">  <code>text-[10px] font-semibold text-slate-500 uppercase tracking-wider</code></li>
+        <li class="citation">  <code>text-xs font-semibold uppercase tracking-wider</code></li>
+        <li class="citation">  <code>text-[11px] uppercase tracking-wider text-slate-500</code></li>
+        <li class="citation">  <code>block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-0.5</code></li>
+        <li class="citation">  <code>text-[10px] font-medium text-slate-400 uppercase tracking-wider</code></li>
+        <li>Same intent, 4–5 different sizes, 2 different tracking, 3 different colors.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · five eyebrows, five classNames</div>
+        <div class="demo">
+          <div style="font-size:10px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">Question type</div>
+          <div style="font-size:11px;font-weight:500;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;">Org</div>
+          <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Status</div>
+        </div>
+<div class="code">&lt;<span class="raw">label</span> className=<span class="raw">"text-[10px] font-semibold tracking-wider …"</span>&gt;Question type&lt;/<span class="raw">label</span>&gt;
+&lt;<span class="raw">label</span> className=<span class="raw">"text-[11px] uppercase tracking-wider …"</span>&gt;Org&lt;/<span class="raw">label</span>&gt;
+&lt;<span class="raw">label</span> className=<span class="raw">"text-xs font-semibold uppercase tracking-wider"</span>&gt;Status&lt;/<span class="raw">label</span>&gt;</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · one Eyebrow primitive</div>
+        <div class="demo">
+          <div style="font-size:10px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">Question type</div>
+          <div style="font-size:10px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">Org</div>
+          <div style="font-size:10px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;">Status</div>
+        </div>
+<div class="code">&lt;<span class="tok">Eyebrow</span>&gt;Question type&lt;/<span class="tok">Eyebrow</span>&gt;
+&lt;<span class="tok">Eyebrow</span>&gt;Org&lt;/<span class="tok">Eyebrow</span>&gt;
+&lt;<span class="tok">Eyebrow</span>&gt;Status&lt;/<span class="tok">Eyebrow</span>&gt;
+<span class="cmt">// canonical: text-[10px] font-semibold text-slate-500 uppercase tracking-wider</span></div>
+      </div>
+    </div>
+    <div class="delta-row">Δ −~20 className recipes → 1 <code>&lt;Eyebrow&gt;</code> primitive</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A07</span>
+      <span class="axis-name">Responsiveness · grids</span>
+      <span class="status significant">Significant</span>
+      <span class="scope">src/pages/* · 33 files</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>Across the whole tree: 9 <code>md:</code> hits, 7 <code>lg:</code> hits. Zero <code>sm:</code>, zero <code>xl:</code>.</li>
+        <li>Effectively a desktop-only application — mobile layout is not handled.</li>
+        <li>The KPI grids on Dashboard / Organizations / Evaluations don't reflow under ~900px.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · 4-column grid, no breakpoints</div>
+        <div class="demo">
+          <div style="display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:6px;">
+            <div style="background:#fff;border:1px solid #E2E8F0;border-radius:6px;padding:8px;font-size:10px;">Score</div>
+            <div style="background:#fff;border:1px solid #E2E8F0;border-radius:6px;padding:8px;font-size:10px;">Open</div>
+            <div style="background:#fff;border:1px solid #E2E8F0;border-radius:6px;padding:8px;font-size:10px;">Pending</div>
+            <div style="background:#fff;border:1px solid #E2E8F0;border-radius:6px;padding:8px;font-size:10px;">Resolved</div>
+          </div>
+        </div>
+<div class="code">&lt;<span class="raw">div</span> className=<span class="raw">"grid grid-cols-4 gap-4"</span>&gt;
+  &lt;<span class="tok">ScoreCard</span> … /&gt;
+  …
+&lt;/<span class="raw">div</span>&gt;</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · mobile-first reflow</div>
+        <div class="demo">
+          <div style="display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:6px;">
+            <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:8px;font-size:10px;">Score</div>
+            <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:8px;font-size:10px;">Open</div>
+            <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:8px;font-size:10px;">Pending</div>
+            <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:8px;font-size:10px;">Resolved</div>
+          </div>
+        </div>
+<div class="code">&lt;<span class="tok">div</span> className=<span class="tok">"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"</span>&gt;
+  &lt;<span class="tok">ScoreCard</span> … /&gt;
+&lt;/<span class="tok">div</span>&gt;</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ +mobile-first responsive scaffold on KPI grids (Dashboard, Organizations, Evaluations)</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A08</span>
+      <span class="axis-name">Accessibility</span>
+      <span class="status major">Major</span>
+      <span class="scope">src/ · 33 files</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>aria-label: <strong>0</strong> files · aria-describedby: <strong>0</strong> · role=: <strong>0</strong> · sr-only: <strong>1</strong> · prefers-reduced-motion: <strong>0</strong>.</li>
+        <li>Icon-only paginator buttons (‹ / ›), filter dismiss buttons, sort arrows — all unlabeled.</li>
+        <li>This is the lowest assistive-tech coverage of the three audited projects.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · paginator + filter buttons silent to AT</div>
+        <div class="demo">
+          <div style="display:flex;gap:6px;align-items:center;font-size:11.5px;">
+            <button style="padding:4px 9px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;">‹</button>
+            <button style="padding:4px 9px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;">›</button>
+            <button style="padding:4px 9px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;color:#94A3B8;">×</button>
+          </div>
+        </div>
+<div class="code">&lt;<span class="raw">button</span> onClick={prev}&gt;‹&lt;/<span class="raw">button</span>&gt;
+&lt;<span class="raw">button</span> onClick={next}&gt;›&lt;/<span class="raw">button</span>&gt;
+&lt;<span class="raw">button</span> onClick={clear}&gt;×&lt;/<span class="raw">button</span>&gt;</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · labels + role</div>
+        <div class="demo">
+          <div style="display:flex;gap:6px;align-items:center;font-size:11.5px;">
+            <button style="padding:4px 9px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;">‹</button>
+            <button style="padding:4px 9px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;">›</button>
+            <button style="padding:4px 9px;border:1px solid #E2E8F0;border-radius:6px;background:#fff;color:#64748B;">×</button>
+          </div>
+        </div>
+<div class="code">&lt;<span class="tok">button</span> onClick={prev} aria-label=<span class="tok">"Previous page"</span>&gt;‹&lt;/<span class="tok">button</span>&gt;
+&lt;<span class="tok">button</span> onClick={next} aria-label=<span class="tok">"Next page"</span>&gt;›&lt;/<span class="tok">button</span>&gt;
+&lt;<span class="tok">button</span> onClick={clear} aria-label=<span class="tok">"Clear filter"</span>&gt;×&lt;/<span class="tok">button</span>&gt;</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ +~25 aria-label on icon-only controls · +sr-only label on the live alert count · +motion-reduce gate on Skeleton</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A09</span>
+      <span class="axis-name">Motion</span>
+      <span class="status significant">Significant</span>
+      <span class="scope">QueryExplorer.tsx · Evaluations.tsx · Skeleton.tsx</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>2 raw inline-SVG spinners (animate-spin) on QueryExplorer + Evaluations toolbar buttons.</li>
+        <li>6 animate-pulse uses outside the canonical Skeleton primitive.</li>
+        <li>No <code>prefers-reduced-motion</code> gate anywhere — every animation runs unconditionally.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · inline SVG spinner + ad-hoc pulse blocks</div>
+        <div class="demo">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="pm-spinner"></span><span style="font-size:11.5px;">Running…</span>
+          </div>
+          <div style="margin-top:10px;height:14px;background:#E5E7EB;border-radius:4px;width:60%;animation:pulse 1.4s ease-in-out infinite;"></div>
+          <style>@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }</style>
+        </div>
+<div class="code">&lt;<span class="raw">svg</span> className=<span class="raw">"animate-spin w-3.5 h-3.5"</span>&gt;…&lt;/<span class="raw">svg</span>&gt;
+&lt;<span class="raw">div</span> className=<span class="raw">"animate-pulse bg-zinc-200 h-4 rounded"</span> /&gt;</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · Spinner primitive + Skeleton</div>
+        <div class="demo">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="pm-spinner"></span><span style="font-size:11.5px;">Running…</span>
+          </div>
+          <div style="margin-top:10px;height:14px;background:#E2E8F0;border-radius:6px;width:60%;animation:pulse 1.4s ease-in-out infinite;"></div>
+        </div>
+<div class="code">&lt;<span class="tok">Spinner</span> size=<span class="tok">"sm"</span> /&gt; Running…
+&lt;<span class="tok">Skeleton</span> className=<span class="tok">"h-4 w-3/5"</span> /&gt;
+<span class="cmt">// both honour prefers-reduced-motion internally</span></div>
+      </div>
+    </div>
+    <div class="delta-row">Δ −2 inline-svg spinners → +1 Spinner primitive · −6 ad-hoc pulse blocks → Skeleton</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A12</span>
+      <span class="axis-name">Dark / theme mode</span>
+      <span class="status major">Major</span>
+      <span class="scope">100% light-only — 178 / 178 bg-* declarations</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>Total <code>bg-*-NNN</code> classes: 178 · with paired <code>dark:bg-*</code>: <strong>0</strong>.</li>
+        <li>No theme switcher anywhere; tailwind.config has no <code>darkMode</code> setting.</li>
+        <li>If dark mode is in scope, this is a from-scratch addition (not a partial-coverage fix).</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · no dark mode (any surface)</div>
+        <div class="demo">
+          <div style="background:#fff;border:1px solid #E2E8F0;border-radius:8px;padding:10px;">
+            <div style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;">Quality score</div>
+            <div style="font-size:18px;font-weight:700;font-family:var(--mono);">87.4</div>
+          </div>
+        </div>
+<div class="code">&lt;<span class="raw">div</span> className=<span class="raw">"bg-white border-slate-200 rounded-lg"</span>&gt;
+  &lt;<span class="raw">span</span> className=<span class="raw">"text-slate-500"</span>&gt;Quality score&lt;/<span class="raw">span</span>&gt;
+&lt;/<span class="raw">div</span>&gt;</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · dark: pair on every surface</div>
+        <div class="demo">
+          <div style="background:#0F172A;border:1px solid #1E293B;border-radius:8px;padding:10px;">
+            <div style="font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;">Quality score</div>
+            <div style="font-size:18px;font-weight:700;color:#F1F5F9;font-family:var(--mono);">87.4</div>
+          </div>
+        </div>
+<div class="code">&lt;<span class="tok">div</span> className=<span class="tok">"bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-lg"</span>&gt;
+  &lt;<span class="tok">span</span> className=<span class="tok">"text-slate-500 dark:text-slate-400"</span>&gt;Quality score&lt;/<span class="tok">span</span>&gt;
+&lt;/<span class="tok">div</span>&gt;</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ +178 dark: pair additions (or: extract surface tokens behind <code>bg-surface</code> / <code>text-muted</code> primitives)</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A14</span>
+      <span class="axis-name">Responsiveness · tables</span>
+      <span class="status significant">Significant</span>
+      <span class="scope">8 table files · 3 wrap in overflow-x</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>Files with <code>&lt;table&gt;</code>: 8 · with <code>overflow-x</code>: 3.</li>
+        <li>Pages with tables and no Pagination import: Alerts, Intelligence, Issues, QuestionTypes.</li>
+        <li>No column-hiding strategy — no <code>md:hidden</code> / <code>sm:table-cell</code> hits.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · table renders past viewport</div>
+        <div class="demo">
+          <div style="border:1px solid #E5E7EB;border-radius:6px;background:#fff;overflow:hidden;">
+            <div style="display:grid;grid-template-columns:0.7fr 1.4fr 1fr 0.9fr 0.7fr;gap:6px;padding:6px 10px;font-size:10px;background:#F9FAFB;color:#6B7280;text-transform:uppercase;letter-spacing:0.04em;">
+              <div>ID</div><div>Query</div><div>Org</div><div>Q-type</div><div>Score</div>
+            </div>
+            <div style="display:grid;grid-template-columns:0.7fr 1.4fr 1fr 0.9fr 0.7fr;gap:6px;padding:6px 10px;font-size:11.5px;">
+              <div>#1421</div><div>show me cardinality drift</div><div>Acme</div><div>ad-hoc</div><div>92</div>
+            </div>
+          </div>
+        </div>
+<div class="code">&lt;<span class="raw">table</span> className="w-full"&gt; <span class="cmt">/* no wrapper */</span>
+&lt;/<span class="raw">table</span>&gt;</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · overflow + responsive column-hide</div>
+        <div class="demo">
+          <div style="border:1px solid #E2E8F0;border-radius:8px;background:#fff;overflow:hidden;">
+            <div style="display:grid;grid-template-columns:0.7fr 1.4fr 1fr 0.7fr;gap:6px;padding:6px 10px;font-size:10px;background:#F1F5F9;color:#475569;text-transform:uppercase;letter-spacing:0.04em;">
+              <div>ID</div><div>Query</div><div>Org</div><div>Score</div>
+            </div>
+            <div style="display:grid;grid-template-columns:0.7fr 1.4fr 1fr 0.7fr;gap:6px;padding:6px 10px;font-size:11.5px;">
+              <div>#1421</div><div>show me cardinality drift</div><div>Acme</div><div>92</div>
+            </div>
+          </div>
+        </div>
+<div class="code">&lt;<span class="tok">div</span> className=<span class="tok">"overflow-x-auto"</span>&gt;
+  &lt;<span class="tok">table</span>&gt;
+    &lt;<span class="tok">th</span> className=<span class="tok">"hidden md:table-cell"</span>&gt;Q-type&lt;/<span class="tok">th</span>&gt;
+  &lt;/<span class="tok">table</span>&gt;
+&lt;/<span class="tok">div</span>&gt;</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ +5 overflow-x wrappers · column-hide on Q-type / Last touch / Latency on md</div>
+  </div>
+
+  <div class="axis-card ok-card">
+    <div class="head">
+      <span class="num">A11</span>
+      <span class="axis-name">Data display · A13 Hygiene</span>
+      <span class="status ok">OK · 2 axes</span>
+      <span class="scope">strong baseline</span>
+    </div>
+    <div class="single">
+      <strong>Data display (A11):</strong> 10 of 33 files use <code>tabular-nums</code> — strong adoption for a small app. ScoreCard, TrendChart, Pagination all align numerics correctly. Shared fmt helpers in <code>src/lib/format.ts</code>.
+      <br/><br/>
+      <strong>Hygiene (A13):</strong> Zero <code>as any</code>, zero TODO, zero FIXME, zero console residue. Cleanest hygiene of the three audited projects — a credit to whoever set up the lint rules.
+    </div>
+  </div>
+
+  <div class="axis-card ok-card">
+    <div class="head">
+      <span class="num">A01</span>
+      <span class="axis-name">Primitives · A02 Library convention · A03 App convention · A06 Radii · A10 Forms</span>
+      <span class="status minor">Minor · 5 axes</span>
+      <span class="scope">batch</span>
+    </div>
+    <div class="single">
+      Five axes land at Minor. <strong>A01</strong>: small components/ dir with strong primitives (<code>StatusBadge</code>, <code>ScoreCard</code>, <code>Pagination</code>); only inline <code>Section</code> duplicated 3 times. <strong>A02</strong>: <code>StatusBadge</code>'s tone-keyed lookup is the closest thing to a variant API — works well. <strong>A03</strong>: PageHeader + useQueryFilters exist and adopted on 7 of 9 pages; only Alerts + Issues bypass. <strong>A06</strong>: radii spread is reasonable. <strong>A10</strong>: filter primitives (<code>SearchableSelect</code>, <code>MultiSelectFilter</code>, <code>PeriodSelector</code>) are solid; raw <code>&lt;input&gt;</code> on QueryExplorer toolbar is the holdout.
+    </div>
+  </div>
+
+  <h2 class="section-title">Section 2 · Page in context <span class="sub">src/pages/Alerts.tsx — drift-density leader (25 gray-* hits + h1 bypass + 0 dark + no aria)</span></h2>
+  <div class="context-wrap">
+    <div class="context-pair">
+      <div class="frame bad">
+        <div class="frame-tag"><span style="display:inline-block;width:8px;height:8px;border-radius:99px;background:currentColor;"></span> Before <span class="meta">A03 + A04 + A08 + A12 + A14 visible</span></div>
+        <div class="page-mock">
+          <div class="row-with-note"><span class="note bad">A03 — bypasses PageHeader</span><span class="note bad">A05 — inline h1 className</span></div>
+          <h1 class="pm-h1 drift">Alerts</h1>
+          <p class="pm-sub" style="color:#6B7280;">Active monitors and recent firings.</p>
+          <div class="row-with-note"><span class="note bad">A04 — gray-500 text + gray-200 borders</span></div>
+          <div class="pm-toolbar">
+            <button class="pm-btn" style="border-color:#E5E7EB;color:#4B5563;">All severities</button>
+            <button class="pm-btn" style="border-color:#E5E7EB;color:#4B5563;">All orgs</button>
+            <button class="pm-btn" style="border-color:#E5E7EB;color:#4B5563;">Last 7d</button>
+            <button class="pm-btn" style="margin-left:auto;border-color:#E5E7EB;color:#4B5563;">Export CSV</button>
+          </div>
+          <div class="row-with-note"><span class="note bad">A14 — table, no overflow wrapper</span><span class="note bad">A08 — no aria on row actions</span></div>
+          <div class="pm-table">
+            <div class="pm-table-row head" style="background:#F9FAFB;color:#6B7280;"><div>ID</div><div>Monitor</div><div>Org</div><div>Severity</div><div>Status</div></div>
+            <div class="pm-table-row" style="color:#374151;"><div>#1421</div><div>Mixpanel sync lag &gt; 30m</div><div>Acme Co</div><div><span class="pm-chip error">critical</span></div><div><span class="pm-chip warning">in_progress</span></div></div>
+            <div class="pm-table-row" style="color:#374151;"><div>#1418</div><div>Schema cardinality drift</div><div>Kwontified</div><div><span class="pm-chip warning">warning</span></div><div><span class="pm-chip info">pending</span></div></div>
+            <div class="pm-table-row" style="color:#374151;"><div>#1411</div><div>Backfill row delta</div><div>Northwind</div><div><span class="pm-chip warning">warning</span></div><div><span class="pm-chip success">resolved</span></div></div>
+          </div>
+          <div class="row-with-note" style="margin-top:14px;"><span class="note bad">A12 — bg-white only, no dark pair</span></div>
+        </div>
+      </div>
+      <div class="frame good">
+        <div class="frame-tag"><span style="display:inline-block;width:8px;height:8px;border-radius:99px;background:currentColor;"></span> After <span class="meta">A03 + A04 + A08 + A12 + A14 resolved</span></div>
+        <div class="page-mock">
+          <div class="row-with-note"><span class="note good">A03 + A05 — PageHeader primitive</span></div>
+          <h1 class="pm-h1 fixed">Alerts</h1>
+          <p class="pm-sub">Active monitors and recent firings.</p>
+          <div style="height:1px;background:#E2E8F0;margin:6px 0 12px;"></div>
+          <div class="row-with-note"><span class="note good">A04 — slate-* canonical</span></div>
+          <div class="pm-toolbar">
+            <button class="pm-btn">All severities</button>
+            <button class="pm-btn">All orgs</button>
+            <button class="pm-btn">Last 7d</button>
+            <button class="pm-btn primary" style="margin-left:auto;">Export CSV</button>
+          </div>
+          <div class="row-with-note"><span class="note good">A14 — overflow-x wrapper</span><span class="note good">A08 — aria-label on row actions</span></div>
+          <div class="pm-table fixed">
+            <div class="pm-table-row head fixed"><div>ID</div><div>Monitor</div><div>Org</div><div>Severity</div><div>Status</div></div>
+            <div class="pm-table-row"><div>#1421</div><div>Mixpanel sync lag &gt; 30m</div><div>Acme Co</div><div><span class="pm-chip error">critical</span></div><div><span class="pm-chip warning">in_progress</span></div></div>
+            <div class="pm-table-row"><div>#1418</div><div>Schema cardinality drift</div><div>Kwontified</div><div><span class="pm-chip warning">warning</span></div><div><span class="pm-chip info">pending</span></div></div>
+            <div class="pm-table-row"><div>#1411</div><div>Backfill row delta</div><div>Northwind</div><div><span class="pm-chip warning">warning</span></div><div><span class="pm-chip success">resolved</span></div></div>
+          </div>
+          <div class="row-with-note" style="margin-top:14px;"><span class="note good">A12 — dark: pair on every surface (StatusBadge tone flips internally)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <div>Audit produced by the <a href="https://github.com/sumedh-png/style-drift">style-drift</a> Claude Code skill. Read-only — no source files were modified.</div>
+    <div><code>samples/quality-gateway.html</code></div>
+  </div>
+</div>
+</body>
+</html>

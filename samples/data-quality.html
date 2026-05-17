@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Data Quality Observability — style-drift audit (14 axes)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+:root {
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --doc-bg: #F4F5F8;
+  --doc-fg: #0F172A;
+  --doc-fg-dim: #64748B;
+  --doc-border: #E2E8F0;
+  --bad: #DC2626; --bad-bg: #FEF2F2; --bad-border: #FECACA;
+  --good: #16A34A; --good-bg: #F0FDF4; --good-border: #BBF7D0;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--doc-bg); color: var(--doc-fg); -webkit-font-smoothing: antialiased; }
+.doc { max-width: 1320px; margin: 0 auto; padding: 32px 24px 64px; }
+.doc-head { margin-bottom: 22px; border-bottom: 1px solid var(--doc-border); padding-bottom: 18px; }
+.doc-head h1 { margin: 0 0 6px; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+.doc-head .sub { color: var(--doc-fg-dim); font-size: 13px; line-height: 1.6; }
+.pill { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 4px; letter-spacing: 0.04em; margin: 0 4px 4px 0; vertical-align: middle; }
+.pill.path { background: #EEF2FF; color: #4338CA; font-family: var(--mono); font-weight: 500; }
+.pill.recon { background: #0F172A; color: #F1F5F9; font-weight: 600; }
+.pill.recon b { color: #94A3B8; font-weight: 400; margin-right: 4px; }
+.pill.recon span { color: #F1F5F9; }
+.pill.recon.alert { background: #7F1D1D; }
+.pill.recon.alert b { color: #FCA5A5; }
+.recon-row { margin-top: 10px; line-height: 2; }
+.kpi-row { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+.kpi { background: #fff; border: 1px solid var(--doc-border); border-radius: 8px; padding: 8px 12px; font-size: 12px; display: flex; flex-direction: column; gap: 2px; min-width: 130px; }
+.kpi .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--doc-fg-dim); font-weight: 600; }
+.kpi .val { font-size: 18px; font-weight: 700; color: var(--doc-fg); font-family: var(--mono); line-height: 1; }
+.kpi.major .val { color: #B91C1C; }
+.kpi.sig .val { color: #C2410C; }
+.kpi.min .val { color: #B45309; }
+.kpi.ok .val { color: #16A34A; }
+h2.section-title { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 28px 0 10px; padding-top: 14px; border-top: 1px solid var(--doc-border); }
+h2.section-title .sub { color: var(--doc-fg-dim); font-weight: 400; font-size: 13px; margin-left: 8px; }
+.catalog { width: 100%; border-collapse: collapse; font-size: 12.5px; background: #fff; border: 1px solid var(--doc-border); border-radius: 10px; overflow: hidden; }
+.catalog th, .catalog td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--doc-border); vertical-align: top; }
+.catalog tr:last-child td { border-bottom: none; }
+.catalog th { background: #FAFBFC; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--doc-fg-dim); }
+.catalog td.id { font-family: var(--mono); color: var(--doc-fg-dim); width: 42px; font-weight: 600; }
+.catalog td.name { width: 22%; font-weight: 600; }
+.catalog td.vol { font-family: var(--mono); font-size: 11.5px; color: var(--doc-fg-dim); width: 22%; }
+.status { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.02em; white-space: nowrap; }
+.status.major       { background: #FEF2F2; color: #B91C1C; }
+.status.significant { background: #FFF7ED; color: #C2410C; }
+.status.minor       { background: #FFFBEB; color: #B45309; }
+.status.ok          { background: #F0FDF4; color: #16A34A; }
+.status.na          { background: #F1F5F9; color: #64748B; }
+.legend { margin: 14px 0 4px; display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--doc-fg-dim); }
+.legend .item { display: inline-flex; gap: 6px; align-items: center; }
+.legend .dot { width: 9px; height: 9px; border-radius: 99px; background: var(--bad); box-shadow: 0 0 0 3px rgba(220,38,38,0.18); }
+.legend .item.fixed .dot { background: var(--good); box-shadow: 0 0 0 3px rgba(22,163,74,0.18); }
+.axis-card { background: #fff; border: 1px solid var(--doc-border); border-radius: 12px; padding: 18px 18px 16px; margin-top: 14px; }
+.axis-card .head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.axis-card .head .num { font-family: var(--mono); font-weight: 700; color: var(--doc-fg-dim); font-size: 12px; }
+.axis-card .head .axis-name { font-size: 14px; font-weight: 700; }
+.axis-card .head .scope { font-family: var(--mono); font-size: 11px; color: var(--doc-fg-dim); margin-left: auto; }
+.axis-card .evidence { margin-top: 12px; background: #FAFBFC; border: 1px solid var(--doc-border); border-radius: 8px; padding: 10px 12px; font-size: 12px; }
+.axis-card .evidence .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--doc-fg-dim); font-weight: 700; }
+.axis-card .evidence ul { margin: 6px 0 0; padding-left: 18px; }
+.axis-card .evidence li { margin-bottom: 2px; font-family: var(--mono); font-size: 11.5px; color: #1E293B; }
+.axis-card .evidence .citation { color: var(--doc-fg-dim); }
+.axis-card .pair { margin-top: 12px; display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 1100px) { .axis-card .pair { grid-template-columns: 1fr 1fr; gap: 14px; } }
+.axis-card .b, .axis-card .a { border: 1px solid var(--doc-border); border-radius: 8px; overflow: hidden; min-width: 0; }
+.axis-card .tag { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 12px; display: flex; align-items: center; gap: 8px; }
+.axis-card .b .tag { background: var(--bad-bg); color: var(--bad); border-bottom: 1px solid var(--bad-border); }
+.axis-card .a .tag { background: var(--good-bg); color: var(--good); border-bottom: 1px solid var(--good-border); }
+.axis-card .tag .dot { width: 8px; height: 8px; border-radius: 99px; background: currentColor; }
+.axis-card .demo { padding: 14px; background: #fff; min-height: 60px; }
+.axis-card .code { font-family: var(--mono); font-size: 11px; line-height: 1.55; background: #0F172A; color: #E2E8F0; padding: 10px 12px; overflow-x: auto; white-space: pre; }
+.axis-card .code .raw { color: #FCA5A5; }
+.axis-card .code .tok { color: #86EFAC; }
+.axis-card .code .cmt { color: #64748B; font-style: italic; }
+.axis-card .delta-row { margin-top: 10px; font-size: 11px; font-family: var(--mono); color: var(--good); font-weight: 600; }
+.axis-card.ok-card .single { margin-top: 10px; padding: 12px 14px; background: var(--good-bg); border: 1px solid var(--good-border); border-radius: 8px; font-size: 12px; color: #14532D; line-height: 1.5; }
+.axis-card.na-card .single { margin-top: 10px; padding: 12px 14px; background: #F1F5F9; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 12px; color: #475569; line-height: 1.5; }
+
+.monolith-banner { background: #7F1D1D; color: #FEE2E2; padding: 12px 16px; border-radius: 10px; font-size: 13px; line-height: 1.55; margin-top: 14px; border: 1px solid #991B1B; }
+.monolith-banner strong { color: #FFFFFF; }
+.monolith-banner code { background: rgba(255,255,255,0.10); padding: 1px 6px; border-radius: 4px; font-family: var(--mono); }
+
+.context-wrap { background: #fff; border: 1px solid var(--doc-border); border-radius: 12px; padding: 16px; margin-top: 16px; }
+.context-pair { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 1200px) { .context-pair { grid-template-columns: 1fr 1fr; } }
+.frame { border: 1px solid var(--doc-border); border-radius: 10px; overflow: hidden; background: #fff; min-width: 0; }
+.frame .frame-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 7px 12px; display: flex; gap: 8px; align-items: center; }
+.frame.bad .frame-tag { background: var(--bad-bg); color: var(--bad); border-bottom: 1px solid var(--bad-border); }
+.frame.good .frame-tag { background: var(--good-bg); color: var(--good); border-bottom: 1px solid var(--good-border); }
+.frame .frame-tag .meta { margin-left: auto; font-family: var(--mono); font-size: 10px; font-weight: 500; text-transform: none; letter-spacing: 0; }
+.page-mock { padding: 14px 14px 16px; min-height: 540px; }
+.page-mock.dark { background: #1C1917; color: #F5F5F4; }
+.page-mock .row-with-note { display: flex; align-items: center; gap: 8px; margin: 8px 0 6px; flex-wrap: wrap; }
+.note { font-size: 10px; font-family: var(--mono); padding: 1px 7px; border-radius: 4px; letter-spacing: 0.02em; display: inline-block; }
+.note.bad  { background: var(--bad-bg);  color: #B91C1C; border: 1px solid var(--bad-border); }
+.note.good { background: var(--good-bg); color: #15803D; border: 1px solid var(--good-border); }
+.dq-h1-bad { font-size: 18px; font-weight: 700; margin: 0; color: #FCFCFC; }
+.dq-h1-good { font-size: 18px; font-weight: 600; margin: 0; color: #FCFCFC; letter-spacing: -0.01em; }
+.dq-toolbar { display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap; font-size: 11px; }
+.dq-pill { font-size: 10px; padding: 3px 8px; border-radius: 99px; background: #292524; color: #D6D3D1; border: 1px solid #44403C; }
+.dq-pill.active { background: #F59E0B; color: #1C1917; border-color: #F59E0B; }
+.dq-pill.fixed { border-radius: 6px; }
+.dq-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.dq-grid.fixed { gap: 8px; }
+.dq-card { background: #292524; border: 1px solid #44403C; padding: 9px 11px; border-radius: 7px; }
+.dq-card.fixed { border-radius: 10px; padding: 12px; }
+.dq-card .lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; color: #A8A29E; font-weight: 700; }
+.dq-card .val { font-size: 16px; font-weight: 700; font-family: var(--mono); color: #FCFCFC; margin-top: 2px; }
+.dq-card .val.fixed { font-variant-numeric: tabular-nums; }
+.dq-card .delta { font-size: 9px; color: #A8A29E; margin-top: 1px; }
+.dq-chart { background: #292524; border: 1px solid #44403C; padding: 10px; border-radius: 7px; margin-top: 10px; height: 100px; position: relative; }
+.dq-chart.fixed { border-radius: 10px; }
+.dq-chart .bars { display: flex; align-items: flex-end; gap: 3px; height: 70px; padding-top: 8px; }
+.dq-chart .bar { flex: 1; background: linear-gradient(180deg, #F59E0B 0%, #DC2626 100%); }
+.dq-chart.fixed .bar { background: linear-gradient(180deg, #F59E0B 0%, #B45309 100%); }
+.dq-table { margin-top: 12px; background: #292524; border: 1px solid #44403C; border-radius: 7px; overflow: hidden; }
+.dq-table.fixed { border-radius: 10px; }
+.dq-table-row { display: grid; grid-template-columns: 0.6fr 1.2fr 0.8fr 0.7fr 0.7fr; gap: 6px; padding: 7px 10px; font-size: 11px; border-bottom: 1px solid #44403C; align-items: center; color: #E7E5E4; }
+.dq-table-row:last-child { border-bottom: none; }
+.dq-table-row.head { background: #1C1917; font-size: 9px; text-transform: uppercase; letter-spacing: 0.04em; color: #A8A29E; font-weight: 700; }
+.dq-table-row .num { font-family: var(--mono); }
+.dq-table-row .num.fixed { font-variant-numeric: tabular-nums; }
+
+.footer-note { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--doc-border); font-size: 12px; color: var(--doc-fg-dim); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.footer-note code { font-family: var(--mono); background: #EEF2FF; color: #4338CA; padding: 1px 6px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="doc">
+  <header class="doc-head">
+    <h1>Data Quality Observability — style-drift audit across 14 axes</h1>
+    <div class="sub">
+      <span class="pill path">/Users/sumedh/Documents/Zubair/data-quality-observability/frontend</span>
+      <div class="recon-row">
+        <span class="pill recon"><b>stack</b><span>web</span></span>
+        <span class="pill recon"><b>framework</b><span>react</span></span>
+        <span class="pill recon"><b>styling</b><span>inline-style</span></span>
+        <span class="pill recon"><b>tokens</b><span>theme-object (T.*)</span></span>
+        <span class="pill recon"><b>primitives</b><span>in-file (Btn / Badge / Card)</span></span>
+        <span class="pill recon alert"><b>tree</b><span>single-file-monolith</span></span>
+        <span class="pill recon"><b>files</b><span>4 (App.js: 31,715 lines)</span></span>
+      </div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi major"><div class="label">Major</div><div class="val">6</div></div>
+      <div class="kpi sig"><div class="label">Significant</div><div class="val">4</div></div>
+      <div class="kpi min"><div class="label">Minor</div><div class="val">0</div></div>
+      <div class="kpi ok"><div class="label">OK / OK · N/A</div><div class="val">4</div></div>
+    </div>
+    <div class="monolith-banner">
+      <strong>Recon-driven status adjustments applied (Step 0).</strong> Tree shape <code>single-file-monolith</code> → A03 is automatically Major (no file-scoped components exist). Styling <code>inline-style</code> + primitives <code>in-file</code> → A02 (library convention) is N/A — there's no variant API to fight. <code>App.js</code> alone is <strong>31,715 lines</strong> with <strong>170 component declarations</strong> co-resident.
+    </div>
+  </header>
+
+  <div class="legend">
+    <span class="item"><span class="dot"></span>Drift in BEFORE</span>
+    <span class="item fixed"><span class="dot"></span>Resolved in AFTER</span>
+  </div>
+
+  <h2 class="section-title">Axis catalog <span class="sub">14 rows · status + headline finding + supporting volume (single-file scope)</span></h2>
+  <table class="catalog">
+    <thead>
+      <tr><th>#</th><th>Axis</th><th>Status</th><th>Headline finding</th><th>Volume</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="id">A01</td><td class="name">Primitives</td><td><span class="status significant">Significant</span></td><td>In-file <code>&lt;Btn&gt;</code> / <code>&lt;Badge&gt;</code> / <code>&lt;Card&gt;</code> exist and are used heavily — but raw <code>&lt;button&gt;</code> bypass rate is 49% (281 raw vs 296 primitive).</td><td class="vol">Btn:296 · Badge:73 · Card:58 · raw &lt;button&gt;:281 · raw &lt;input&gt;:154</td></tr>
+      <tr><td class="id">A02</td><td class="name">Library convention</td><td><span class="status na">OK · N/A</span></td><td>Inline-style stack with in-file primitives — no formal variant/tone enum to bypass.</td><td class="vol">—</td></tr>
+      <tr><td class="id">A03</td><td class="name">Application convention</td><td><span class="status major">Major</span></td><td><strong>170 components declared inline in one 31,715-line file.</strong> No file-scoped page chrome possible; any "shared primitive" is just a top-level <code>const</code>. (Auto-set by tree shape per Step 0.)</td><td class="vol">1 file · 31,715 lines · 170 funcs · 3,063 &lt;div&gt; · 3,872 T.* token accessors</td></tr>
+      <tr><td class="id">A04</td><td class="name">Color tokens</td><td><span class="status significant">Significant</span></td><td>Token system (<code>T.*</code>) is in heavy use (3,872 accesses) but ~600 raw hex literals coexist; same color appears in upper + lower case (<code>#F59E0B</code> 31× and <code>#f59e0b</code> separately).</td><td class="vol">top hex: #F59E0B 31 · #f97316 20 · #10B981 20 · #FFFFFF 18 · #EF4444 18 · #8B5CF6 15</td></tr>
+      <tr><td class="id">A05</td><td class="name">Typography</td><td><span class="status major">Major</span></td><td><strong>Zero semantic headings.</strong> Not a single <code>&lt;h1&gt;</code>–<code>&lt;h6&gt;</code> in 31K lines. fontSize ladder spans 15 distinct values from 8 to 32; the modal sizes are 10 (605×) and 11 (561×) — body text never gets a name.</td><td class="vol">h1–h6: 0 · fontSize distinct values: 15 (8/9/10/11/12/13/14/15/16/18/20/24/32)</td></tr>
+      <tr><td class="id">A06</td><td class="name">Radii</td><td><span class="status significant">Significant</span></td><td>15 distinct corner-radius values from 2 to 99 plus <code>"50%"</code> — no scale. Top: 6 (150×), 99 (149×), 8 (137×), 7 (102×).</td><td class="vol">distinct values: 15 + "50%" · top 4: 6/99/8/7</td></tr>
+      <tr><td class="id">A07</td><td class="name">Responsiveness · grids</td><td><span class="status major">Major</span></td><td>Zero <code>@media</code> queries, zero <code>window.innerWidth</code> / <code>matchMedia</code> hooks. Desktop-only by construction.</td><td class="vol">@media: 0 · matchMedia/innerWidth/Dimensions: 0</td></tr>
+      <tr><td class="id">A08</td><td class="name">Accessibility</td><td><span class="status major">Major</span></td><td>0 aria-label, 0 aria-describedby, 0 aria-hidden, 0 alt= — every icon button, every chart, every image is unlabeled. Only 24 <code>role=</code> attrs across 170 components.</td><td class="vol">aria-label: 0 · aria-describedby: 0 · aria-hidden: 0 · alt=: 0 · role=: 24</td></tr>
+      <tr><td class="id">A09</td><td class="name">Motion</td><td><span class="status major">Major</span></td><td>195 transition/animation declarations, <strong>0 prefers-reduced-motion gates</strong>. Vestibular-trigger risk on every hover state in the app.</td><td class="vol">transition/animation/@keyframes: 195 · motion gate: 0</td></tr>
+      <tr><td class="id">A10</td><td class="name">Forms</td><td><span class="status major">Major</span></td><td>154 raw <code>&lt;input&gt;</code> elements, exactly <strong>1</strong> <code>htmlFor=</code>. Label association is essentially absent — screen-reader users cannot navigate filters or settings.</td><td class="vol">raw &lt;input&gt;: 154 · &lt;select&gt;: 66 · &lt;textarea&gt;: 32 · htmlFor=: 1</td></tr>
+      <tr><td class="id">A11</td><td class="name">Data display</td><td><span class="status significant">Significant</span></td><td>Heavy numeric-table app with <strong>1</strong> tabular-nums use. Three fmt helpers (<code>fmtPct</code>, <code>fmtCnt</code>, <code>fmtDate</code>) co-located at the top of App.js — at least the formatter shape is canonical.</td><td class="vol">tabular-nums / fontVariantNumeric: 1 · fmt helpers: 3</td></tr>
+      <tr><td class="id">A12</td><td class="name">Dark / theme mode</td><td><span class="status ok">OK</span></td><td><code>THEMES</code> const declared at L156; 22 <code>isDark</code> branch points. Theme-object pattern is the established convention and is well-adopted.</td><td class="vol">THEMES const: L156 · isDark branches: 22 · default theme: Dark</td></tr>
+      <tr><td class="id">A13</td><td class="name">Hygiene</td><td><span class="status ok">OK</span></td><td>1 TODO, 1 console.warn, 0 FIXME. Remarkably clean residue for a 31K-line file.</td><td class="vol">TODO: 1 · FIXME: 0 · console.log: 0 · console.warn: 1</td></tr>
+      <tr><td class="id">A14</td><td class="name">Responsiveness · tables</td><td><span class="status ok">OK</span></td><td>21 <code>&lt;table&gt;</code> elements, 20 with <code>overflow-x</code> / <code>overflow:auto</code>. Overflow strategy is consistent — almost every table has it.</td><td class="vol">tables: 21 · overflow strategy: 20</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-title">Section 1 · Axes in detail <span class="sub">evidence + BEFORE / AFTER for each non-OK axis · code in inline-style React syntax</span></h2>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A03</span>
+      <span class="axis-name">Application convention — monolith structure</span>
+      <span class="status major">Major</span>
+      <span class="scope">src/App.js · 31,715 lines · 170 funcs</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>The whole frontend is one file. There can't be a shared <code>PageHeader</code> primitive when nothing is file-scoped.</li>
+        <li>170 component declarations in one file (<code>const Btn = …</code>, <code>function Dashboard() { … }</code>, …) — every "page" is just a top-level const.</li>
+        <li>3,063 <code>&lt;div&gt;</code> elements with inline styles — most of which would otherwise be wrapped components.</li>
+        <li>Editor performance degrades past 10K lines; cmd-click → definition takes &gt;1s.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · everything inside App.js</div>
+        <div class="demo">
+          <pre style="font-family:var(--mono);font-size:11px;color:#64748B;margin:0;line-height:1.5;">src/
+└── App.js                  31,715 lines
+    ├── const T = THEMES.dark
+    ├── const fmtPct, fmtCnt, fmtDate
+    ├── const Btn, Badge, Card     (in-file primitives)
+    ├── function Dashboard()       (page)
+    ├── function MonitorDetail()   (page)
+    ├── function Settings()        (page)
+    ├── function ChartA, ChartB…
+    └── …170 components total</pre>
+        </div>
+<div class="code"><span class="cmt">// App.js · L156-31715</span>
+<span class="raw">const</span> <span class="tok">T</span> = THEMES.dark;
+<span class="raw">const</span> <span class="tok">Btn</span>   = ({...p}) =&gt; &lt;<span class="raw">button</span> style={{...}} {...p} /&gt;;
+<span class="raw">const</span> <span class="tok">Badge</span> = …
+<span class="raw">function</span> <span class="tok">Dashboard</span>() { <span class="cmt">/* 1,800 lines */</span> }
+<span class="raw">function</span> <span class="tok">MonitorDetail</span>() { <span class="cmt">/* 2,200 lines */</span> }
+…</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · file-scoped components</div>
+        <div class="demo">
+          <pre style="font-family:var(--mono);font-size:11px;color:#15803D;margin:0;line-height:1.5;">src/
+├── theme.js                T, THEMES, isDark
+├── format.js               fmtPct, fmtCnt, fmtDate
+├── ui/
+│   ├── Btn.jsx · Badge.jsx · Card.jsx
+│   ├── PageHeader.jsx      (new primitive)
+│   └── Eyebrow.jsx         (new primitive)
+├── pages/
+│   ├── Dashboard.jsx
+│   ├── MonitorDetail.jsx
+│   └── Settings.jsx
+└── App.js                  ~120 lines (router only)</pre>
+        </div>
+<div class="code"><span class="cmt">// App.js · after split</span>
+<span class="raw">import</span> { <span class="tok">Dashboard</span>, <span class="tok">MonitorDetail</span>, <span class="tok">Settings</span> } <span class="raw">from</span> <span class="tok">"./pages"</span>;
+<span class="raw">import</span> { <span class="tok">PageHeader</span> } <span class="raw">from</span> <span class="tok">"./ui"</span>;
+
+<span class="raw">export default function</span> <span class="tok">App</span>() {
+  <span class="raw">return</span> &lt;<span class="tok">Routes</span>&gt;…&lt;/<span class="tok">Routes</span>&gt;;
+}</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ split 31,715-line file → ~25 files · enables every other axis fix · prerequisite step in Step 7 ordering</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A01</span>
+      <span class="axis-name">Primitives — 49% raw bypass rate</span>
+      <span class="status significant">Significant</span>
+      <span class="scope">App.js · &lt;Btn&gt; 296 vs &lt;button&gt; 281</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>In-file primitives exist: <code>Btn</code>, <code>Badge</code>, <code>Card</code>.</li>
+        <li>Adoption is split: 296 <code>&lt;Btn&gt;</code> uses vs 281 raw <code>&lt;button&gt;</code> uses (49% bypass).</li>
+        <li>Raw <code>&lt;input&gt;</code> count: 154 · raw <code>&lt;select&gt;</code>: 66 · raw <code>&lt;textarea&gt;</code>: 32. No input primitive defined.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · half the buttons are raw</div>
+        <div class="demo" style="background:#1C1917;color:#F5F5F4;padding:14px;">
+          <button style="font-size:11px;padding:5px 10px;border-radius:6px;background:#292524;color:#F5F5F4;border:1px solid #44403C;cursor:pointer;">Run query</button>
+          <button style="font-size:11px;padding:6px 11px;border-radius:8px;background:#F59E0B;color:#1C1917;border:1px solid #F59E0B;cursor:pointer;margin-left:6px;font-weight:600;">Add monitor</button>
+        </div>
+<div class="code"><span class="cmt">// App.js · Dashboard()</span>
+&lt;<span class="raw">button</span> style={{ fontSize: <span class="tok">11</span>, padding: <span class="tok">"5px 10px"</span>,
+  borderRadius: <span class="tok">6</span>, background: T.surface, color: T.text }}&gt;
+  Run query
+&lt;/<span class="raw">button</span>&gt;
+&lt;<span class="tok">Btn</span> tone=<span class="tok">"primary"</span>&gt;Add monitor&lt;/<span class="tok">Btn</span>&gt;</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · &lt;Btn&gt; everywhere</div>
+        <div class="demo" style="background:#1C1917;color:#F5F5F4;padding:14px;">
+          <button style="font-size:11px;padding:5px 10px;border-radius:7px;background:#292524;color:#F5F5F4;border:1px solid #44403C;cursor:pointer;">Run query</button>
+          <button style="font-size:11px;padding:6px 11px;border-radius:7px;background:#F59E0B;color:#1C1917;border:1px solid #F59E0B;cursor:pointer;margin-left:6px;font-weight:600;">Add monitor</button>
+        </div>
+<div class="code">&lt;<span class="tok">Btn</span>&gt;Run query&lt;/<span class="tok">Btn</span>&gt;
+&lt;<span class="tok">Btn</span> tone=<span class="tok">"primary"</span>&gt;Add monitor&lt;/<span class="tok">Btn</span>&gt;
+<span class="cmt">// + define &lt;Input&gt; primitive — currently zero, 154 raw &lt;input&gt;</span></div>
+      </div>
+    </div>
+    <div class="delta-row">Δ −281 raw &lt;button&gt; → +Btn adoption · +1 Input primitive (covers 154 raw inputs)</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A04</span>
+      <span class="axis-name">Color tokens — case-mixed hex coexists with token system</span>
+      <span class="status significant">Significant</span>
+      <span class="scope">App.js · ~600 raw hex vs 3,872 T.* accesses</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>Token system <code>T.*</code> is real and used 3,872 times — not abandoned.</li>
+        <li>But raw hex literals coexist: top 6 → <code>#F59E0B</code> 31× · <code>#f97316</code> 20× · <code>#10B981</code> 20× · <code>#FFFFFF</code> 18× · <code>#EF4444</code> 18× · <code>#8B5CF6</code> 15×.</li>
+        <li>Same color, upper + lower case appearing separately (<code>#F59E0B</code> 31 + <code>#f59e0b</code> separate) — token-name collisions waiting to happen.</li>
+        <li>Likely chart palette + status colors not yet captured in <code>THEMES</code>.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · raw hex in chart configs</div>
+        <div class="demo" style="background:#1C1917;padding:14px;color:#F5F5F4;">
+          <div style="display:flex;align-items:flex-end;gap:3px;height:60px;">
+            <div style="flex:1;background:#F59E0B;height:40%;"></div>
+            <div style="flex:1;background:#f97316;height:55%;"></div>
+            <div style="flex:1;background:#EF4444;height:80%;"></div>
+            <div style="flex:1;background:#10B981;height:30%;"></div>
+            <div style="flex:1;background:#8B5CF6;height:65%;"></div>
+          </div>
+        </div>
+<div class="code"><span class="cmt">// chart palette scattered as raw hex</span>
+&lt;<span class="raw">Bar</span> fill=<span class="raw">"#F59E0B"</span> /&gt;
+&lt;<span class="raw">Bar</span> fill=<span class="raw">"#f97316"</span> /&gt;  <span class="cmt">// case-mixed</span>
+&lt;<span class="raw">Bar</span> fill=<span class="raw">"#EF4444"</span> /&gt;</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · palette in THEMES</div>
+        <div class="demo" style="background:#1C1917;padding:14px;color:#F5F5F4;">
+          <div style="display:flex;align-items:flex-end;gap:3px;height:60px;">
+            <div style="flex:1;background:#F59E0B;height:40%;"></div>
+            <div style="flex:1;background:#F59E0B;height:55%;opacity:.75;"></div>
+            <div style="flex:1;background:#EF4444;height:80%;"></div>
+            <div style="flex:1;background:#10B981;height:30%;"></div>
+            <div style="flex:1;background:#8B5CF6;height:65%;"></div>
+          </div>
+        </div>
+<div class="code"><span class="cmt">// theme.js</span>
+<span class="raw">export const</span> <span class="tok">CHART_PALETTE</span> = [
+  T.amber, T.amberMuted, T.red, T.green, T.purple
+];
+
+<span class="cmt">// App.js</span>
+{CHART_PALETTE.map(c =&gt; &lt;<span class="tok">Bar</span> fill={c} /&gt;)}</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ −~600 raw hex literals · case normalisation (#F59E0B / #f59e0b → T.amber) · +1 CHART_PALETTE export</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A05</span>
+      <span class="axis-name">Typography — zero semantic headings</span>
+      <span class="status major">Major</span>
+      <span class="scope">App.js · h1–h6 count: 0</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li><strong>Zero <code>&lt;h1&gt;</code>–<code>&lt;h6&gt;</code> elements</strong> in the entire 31K-line app. Page titles render as styled <code>&lt;div&gt;</code>.</li>
+        <li>fontSize ladder: 15 distinct values (8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 24, 32 most common). Mode: <code>fontSize: 10</code> (605 uses) and <code>fontSize: 11</code> (561 uses) — body text.</li>
+        <li>No named sizes (<code>title</code>, <code>body</code>, <code>caption</code>) — every consumer picks a number.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · titles as &lt;div fontSize=18&gt;</div>
+        <div class="demo" style="background:#1C1917;padding:14px;color:#F5F5F4;">
+          <div style="font-size:18px;font-weight:700;margin-bottom:4px;">Monitor: cardinality_drift</div>
+          <div style="font-size:11px;color:#A8A29E;">Acme Co · last run 4m ago</div>
+        </div>
+<div class="code">&lt;<span class="raw">div</span> style={{ fontSize: <span class="tok">18</span>, fontWeight: <span class="tok">700</span> }}&gt;
+  Monitor: cardinality_drift
+&lt;/<span class="raw">div</span>&gt;
+&lt;<span class="raw">div</span> style={{ fontSize: <span class="tok">11</span>, color: T.muted }}&gt;
+  Acme Co · last run 4m ago
+&lt;/<span class="raw">div</span>&gt;</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · &lt;PageHeader&gt; with semantic h1</div>
+        <div class="demo" style="background:#1C1917;padding:14px;color:#F5F5F4;">
+          <div style="font-size:18px;font-weight:600;letter-spacing:-0.01em;margin-bottom:4px;">Monitor: cardinality_drift</div>
+          <div style="font-size:11px;color:#A8A29E;">Acme Co · last run 4m ago</div>
+        </div>
+<div class="code">&lt;<span class="tok">PageHeader</span>
+  title=<span class="tok">"Monitor: cardinality_drift"</span>
+  meta=<span class="tok">"Acme Co · last run 4m ago"</span>
+/&gt;
+<span class="cmt">// renders &lt;h1 className="dq-title"&gt; internally</span>
+
+<span class="cmt">// + theme.js</span>
+<span class="raw">export const</span> <span class="tok">TYPE</span> = {
+  title:   { fontSize: <span class="tok">18</span>, fontWeight: <span class="tok">600</span> },
+  body:    { fontSize: <span class="tok">12</span> },
+  caption: { fontSize: <span class="tok">11</span>, color: T.muted },
+  eyebrow: { fontSize: <span class="tok">10</span>, textTransform: <span class="tok">"uppercase"</span> },
+};</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ +1 semantic h1 per page · 15-value fontSize ladder → 4 named tokens (title / body / caption / eyebrow)</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A06</span>
+      <span class="axis-name">Radii — 15 distinct values, no scale</span>
+      <span class="status significant">Significant</span>
+      <span class="scope">App.js · borderRadius literal distribution</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>15 distinct numeric values: 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 20, 99 — plus <code>"50%"</code>.</li>
+        <li>Top distribution: 6 (150×), 99 (149×), 8 (137×), 7 (102×), 10 (91×), <code>"50%"</code> (69×).</li>
+        <li>Difference between 6 / 7 / 8 / 9 / 10 is sub-pixel at typical card sizes — visual noise, not intent.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · 5 different "card" radii in one view</div>
+        <div class="demo" style="background:#1C1917;padding:14px;color:#F5F5F4;display:flex;gap:6px;">
+          <div style="background:#292524;border-radius:6px;padding:8px;font-size:10px;border:1px solid #44403C;">r:6</div>
+          <div style="background:#292524;border-radius:7px;padding:8px;font-size:10px;border:1px solid #44403C;">r:7</div>
+          <div style="background:#292524;border-radius:8px;padding:8px;font-size:10px;border:1px solid #44403C;">r:8</div>
+          <div style="background:#292524;border-radius:10px;padding:8px;font-size:10px;border:1px solid #44403C;">r:10</div>
+        </div>
+<div class="code"><span class="cmt">// scattered through 170 components</span>
+borderRadius: <span class="raw">6</span>,
+borderRadius: <span class="raw">7</span>,
+borderRadius: <span class="raw">8</span>,
+borderRadius: <span class="raw">10</span>,</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · 4-step named scale</div>
+        <div class="demo" style="background:#1C1917;padding:14px;color:#F5F5F4;display:flex;gap:6px;">
+          <div style="background:#292524;border-radius:4px;padding:8px;font-size:10px;border:1px solid #44403C;">sm</div>
+          <div style="background:#292524;border-radius:8px;padding:8px;font-size:10px;border:1px solid #44403C;">md</div>
+          <div style="background:#292524;border-radius:12px;padding:8px;font-size:10px;border:1px solid #44403C;">lg</div>
+          <div style="background:#292524;border-radius:999px;padding:8px;font-size:10px;border:1px solid #44403C;">pill</div>
+        </div>
+<div class="code"><span class="raw">export const</span> <span class="tok">RADII</span> = {
+  sm: <span class="tok">4</span>,    <span class="cmt">// chips, inputs</span>
+  md: <span class="tok">8</span>,    <span class="cmt">// cards</span>
+  lg: <span class="tok">12</span>,   <span class="cmt">// modals, panels</span>
+  pill: <span class="tok">999</span>,
+};
+borderRadius: RADII.<span class="tok">md</span>,</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ 15 distinct values + "50%" → 4 named tokens (sm / md / lg / pill)</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A07</span>
+      <span class="axis-name">Responsiveness · grids</span>
+      <span class="status major">Major</span>
+      <span class="scope">App.js · @media queries: 0</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>Zero <code>@media</code> queries (inline-style React can't write CSS media queries natively).</li>
+        <li>Zero <code>window.innerWidth</code> / <code>matchMedia</code> hooks for adaptive layouts.</li>
+        <li>Layout is fixed-width — sidebar 168px + content + dock 240px — assumes ~1280px+ viewport.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · 4-column KPI grid, fixed</div>
+        <div class="demo" style="background:#1C1917;padding:14px;">
+          <div style="display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:6px;">
+            <div class="dq-card"><div class="lbl">Score</div><div class="val">87.4</div></div>
+            <div class="dq-card"><div class="lbl">Open</div><div class="val">14</div></div>
+            <div class="dq-card"><div class="lbl">Pending</div><div class="val">3</div></div>
+            <div class="dq-card"><div class="lbl">Resolved</div><div class="val">82</div></div>
+          </div>
+        </div>
+<div class="code">&lt;<span class="raw">div</span> style={{
+  display: <span class="tok">"grid"</span>,
+  gridTemplateColumns: <span class="tok">"repeat(4, 1fr)"</span>,
+  gap: <span class="tok">8</span>,
+}}&gt;…&lt;/<span class="raw">div</span>&gt;</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · adaptive via useWindowSize</div>
+        <div class="demo" style="background:#1C1917;padding:14px;">
+          <div style="display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:8px;">
+            <div class="dq-card fixed"><div class="lbl">Score</div><div class="val fixed">87.4</div></div>
+            <div class="dq-card fixed"><div class="lbl">Open</div><div class="val fixed">14</div></div>
+            <div class="dq-card fixed"><div class="lbl">Pending</div><div class="val fixed">3</div></div>
+            <div class="dq-card fixed"><div class="lbl">Resolved</div><div class="val fixed">82</div></div>
+          </div>
+        </div>
+<div class="code"><span class="cmt">// ui/useResponsive.js</span>
+<span class="raw">export function</span> <span class="tok">useCols</span>() {
+  <span class="raw">const</span> w = useWindowWidth();
+  <span class="raw">return</span> w &lt; <span class="tok">640</span> ? <span class="tok">1</span> : w &lt; <span class="tok">1024</span> ? <span class="tok">2</span> : <span class="tok">4</span>;
+}
+
+&lt;<span class="tok">div</span> style={{
+  gridTemplateColumns: `repeat(${useCols()}, 1fr)`,
+}}&gt;…&lt;/<span class="tok">div</span>&gt;</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ +1 useWindowWidth / useCols hook · adaptive grids on Dashboard + Settings + MonitorDetail</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A08</span>
+      <span class="axis-name">Accessibility — silent to assistive tech</span>
+      <span class="status major">Major</span>
+      <span class="scope">App.js · aria-* coverage: 0</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>aria-label: <strong>0</strong> · aria-describedby: <strong>0</strong> · aria-hidden: <strong>0</strong> · alt=: <strong>0</strong>.</li>
+        <li>Only 24 <code>role=</code> attrs across 170 components — and 0 semantic headings (A05) means no document outline at all.</li>
+        <li>Every chart, every icon button, every status badge is announced as an unlabeled div.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · chart announces nothing</div>
+        <div class="demo" style="background:#1C1917;padding:14px;">
+          <div class="dq-chart">
+            <div style="font-size:10px;color:#A8A29E;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:4px;">Quality score · 30d</div>
+            <div class="bars">
+              <div class="bar" style="height:40%"></div>
+              <div class="bar" style="height:55%"></div>
+              <div class="bar" style="height:70%"></div>
+              <div class="bar" style="height:45%"></div>
+              <div class="bar" style="height:60%"></div>
+              <div class="bar" style="height:80%"></div>
+              <div class="bar" style="height:35%"></div>
+            </div>
+          </div>
+        </div>
+<div class="code">&lt;<span class="raw">div</span> style={{...}}&gt;Quality score · 30d&lt;/<span class="raw">div</span>&gt;
+&lt;<span class="raw">div</span> style={{ display:<span class="tok">"flex"</span> }}&gt;
+  {bars.map(b =&gt; &lt;<span class="raw">div</span> style={{ height:b.h }} /&gt;)}
+&lt;/<span class="raw">div</span>&gt;
+<span class="cmt">// no role, no label, no fallback text</span></div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · labeled + fallback summary</div>
+        <div class="demo" style="background:#1C1917;padding:14px;">
+          <div class="dq-chart fixed">
+            <div style="font-size:10px;color:#A8A29E;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:4px;">Quality score · 30d</div>
+            <div class="bars">
+              <div class="bar" style="height:40%"></div>
+              <div class="bar" style="height:55%"></div>
+              <div class="bar" style="height:70%"></div>
+              <div class="bar" style="height:45%"></div>
+              <div class="bar" style="height:60%"></div>
+              <div class="bar" style="height:80%"></div>
+              <div class="bar" style="height:35%"></div>
+            </div>
+          </div>
+        </div>
+<div class="code">&lt;<span class="tok">div</span> role=<span class="tok">"img"</span> aria-label={
+    `Quality score over 30 days: min ${min}, max ${max}, trend ${trend}.`
+  }&gt;…&lt;/<span class="tok">div</span>&gt;
+&lt;<span class="tok">button</span> aria-label=<span class="tok">"View tabular data"</span>&gt;…&lt;/<span class="tok">button</span>&gt;</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ +role + aria-label on every chart · +aria-label on icon buttons · +alt on logos · +1 h1 per page (A05)</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A09</span>
+      <span class="axis-name">Motion — 195 transitions, zero motion gate</span>
+      <span class="status major">Major</span>
+      <span class="scope">App.js · transition / animation declarations: 195</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>195 inline <code>transition</code> / <code>animation</code> declarations + <code>@keyframes</code>.</li>
+        <li>Zero gates on <code>matchMedia("(prefers-reduced-motion: reduce)")</code>.</li>
+        <li>Hover scales, fades, slide-ins fire unconditionally — vestibular-trigger risk.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · transitions always on</div>
+        <div class="demo" style="background:#1C1917;padding:14px;color:#F5F5F4;">
+          <button onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" style="font-size:11px;padding:5px 10px;border-radius:6px;background:#292524;color:#F5F5F4;border:1px solid #44403C;cursor:pointer;transition:transform 0.18s ease;">Hover me</button>
+          <span style="font-size:10px;color:#A8A29E;margin-left:10px;">transition: transform 0.18s ease;</span>
+        </div>
+<div class="code">style={{
+  transition: <span class="raw">"transform 0.18s ease"</span>,
+  ":hover": { transform: <span class="raw">"scale(1.05)"</span> },
+}}</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · gated by useReducedMotion</div>
+        <div class="demo" style="background:#1C1917;padding:14px;color:#F5F5F4;">
+          <button style="font-size:11px;padding:5px 10px;border-radius:7px;background:#292524;color:#F5F5F4;border:1px solid #44403C;cursor:pointer;">Hover me</button>
+          <span style="font-size:10px;color:#A8A29E;margin-left:10px;">honours user preference</span>
+        </div>
+<div class="code"><span class="raw">const</span> reduceMotion = <span class="tok">useReducedMotion</span>();
+
+style={{
+  transition: reduceMotion ? <span class="tok">"none"</span> : <span class="tok">"transform 0.18s ease"</span>,
+}}
+
+<span class="cmt">// ui/useReducedMotion.js</span>
+<span class="raw">export function</span> <span class="tok">useReducedMotion</span>() {
+  <span class="raw">return</span> matchMedia(<span class="tok">"(prefers-reduced-motion: reduce)"</span>).matches;
+}</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ +1 useReducedMotion hook · 195 transitions gated through it</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A10</span>
+      <span class="axis-name">Forms — 154 inputs, 1 label association</span>
+      <span class="status major">Major</span>
+      <span class="scope">App.js · raw &lt;input&gt;: 154 · htmlFor=: 1</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>154 raw <code>&lt;input&gt;</code> elements · 66 raw <code>&lt;select&gt;</code> · 32 raw <code>&lt;textarea&gt;</code>.</li>
+        <li>Exactly <strong>1</strong> <code>htmlFor=</code> attribute across all 31K lines.</li>
+        <li>No <code>&lt;Input&gt;</code> primitive defined — every form site rolls its own.</li>
+        <li>Screen-reader users cannot identify which label belongs to which control.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · label and input are siblings only</div>
+        <div class="demo" style="background:#1C1917;padding:14px;color:#F5F5F4;">
+          <div style="font-size:10px;color:#A8A29E;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;margin-bottom:4px;">Org</div>
+          <input style="font-size:11px;padding:5px 9px;border-radius:6px;background:#292524;color:#F5F5F4;border:1px solid #44403C;width:200px;" placeholder="Acme" />
+        </div>
+<div class="code">&lt;<span class="raw">div</span> style={eyebrow}&gt;Org&lt;/<span class="raw">div</span>&gt;
+&lt;<span class="raw">input</span> style={inputBox} placeholder=<span class="tok">"Acme"</span> /&gt;
+<span class="cmt">// no htmlFor / id linkage</span></div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · &lt;Input&gt; primitive with built-in label</div>
+        <div class="demo" style="background:#1C1917;padding:14px;color:#F5F5F4;">
+          <div style="font-size:10px;color:#A8A29E;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;margin-bottom:4px;">Org</div>
+          <input style="font-size:11px;padding:5px 9px;border-radius:7px;background:#292524;color:#F5F5F4;border:1px solid #44403C;width:200px;" placeholder="Acme" />
+        </div>
+<div class="code">&lt;<span class="tok">Input</span> label=<span class="tok">"Org"</span> placeholder=<span class="tok">"Acme"</span> /&gt;
+
+<span class="cmt">// ui/Input.jsx</span>
+<span class="raw">export function</span> <span class="tok">Input</span>({ label, ...props }) {
+  <span class="raw">const</span> id = useId();
+  <span class="raw">return</span> &lt;<span class="raw">&gt;</span>
+    &lt;<span class="tok">label</span> htmlFor={id} style={eyebrow}&gt;{label}&lt;/<span class="tok">label</span>&gt;
+    &lt;<span class="tok">input</span> id={id} {...props} /&gt;
+  &lt;<span class="raw">/&gt;</span>;
+}</div>
+      </div>
+    </div>
+    <div class="delta-row">Δ +1 &lt;Input&gt; primitive · 154 raw &lt;input&gt; → Input · +154 htmlFor associations</div>
+  </div>
+
+  <div class="axis-card">
+    <div class="head">
+      <span class="num">A11</span>
+      <span class="axis-name">Data display — 1 tabular-nums in a numeric-table app</span>
+      <span class="status significant">Significant</span>
+      <span class="scope">App.js · tabular-nums / fontVariantNumeric: 1</span>
+    </div>
+    <div class="evidence">
+      <div class="lbl">Pattern</div>
+      <ul>
+        <li>21 tables of numeric data, only <strong>1</strong> uses <code>fontVariantNumeric: "tabular-nums"</code>.</li>
+        <li>Numeric columns wobble — "1,234" misaligns vertically against "1,567" in proportional fonts.</li>
+        <li>Three top-of-file fmt helpers (<code>fmtPct</code>, <code>fmtCnt</code>, <code>fmtDate</code>) are already canonical — at least format strings are consistent.</li>
+      </ul>
+    </div>
+    <div class="pair">
+      <div class="b">
+        <div class="tag"><span class="dot"></span>Before · proportional digits wobble</div>
+        <div class="demo" style="background:#1C1917;padding:14px;color:#F5F5F4;">
+          <div style="font-family:var(--sans);font-size:12px;text-align:right;width:140px;">
+            <div>1,234,567</div>
+            <div>987,432</div>
+            <div>1,111,000</div>
+          </div>
+        </div>
+<div class="code"><span class="cmt">// Recharts cell renderer</span>
+&lt;<span class="raw">td</span> style={{ textAlign: <span class="tok">"right"</span> }}&gt;
+  {fmtCnt(value)}
+&lt;/<span class="raw">td</span>&gt;</div>
+      </div>
+      <div class="a">
+        <div class="tag"><span class="dot"></span>After · tabular-nums</div>
+        <div class="demo" style="background:#1C1917;padding:14px;color:#F5F5F4;">
+          <div style="font-family:var(--sans);font-size:12px;text-align:right;width:140px;font-variant-numeric:tabular-nums;">
+            <div>1,234,567</div>
+            <div>987,432</div>
+            <div>1,111,000</div>
+          </div>
+        </div>
+<div class="code">&lt;<span class="tok">td</span> style={{
+  textAlign: <span class="tok">"right"</span>,
+  fontVariantNumeric: <span class="tok">"tabular-nums"</span>,
+}}&gt;
+  {fmtCnt(value)}
+&lt;/<span class="tok">td</span>&gt;
+<span class="cmt">// or: &lt;NumericCell value={value} /&gt;</span></div>
+      </div>
+    </div>
+    <div class="delta-row">Δ +1 NumericCell primitive · 21 tables wired through it</div>
+  </div>
+
+  <div class="axis-card ok-card">
+    <div class="head">
+      <span class="num">A12</span>
+      <span class="axis-name">Dark / theme mode · A13 Hygiene · A14 Tables</span>
+      <span class="status ok">OK · 3 axes</span>
+      <span class="scope">strong despite the monolith</span>
+    </div>
+    <div class="single">
+      <strong>A12 — Theme:</strong> <code>THEMES</code> const at App.js:156, 22 <code>isDark</code> branches throughout. Theme-object pattern is the established convention and is well-adopted.<br/><br/>
+      <strong>A13 — Hygiene:</strong> 1 TODO, 1 console.warn, 0 FIXME, 0 console.log. Remarkably clean residue for a 31,715-line file.<br/><br/>
+      <strong>A14 — Tables:</strong> 21 tables, 20 with <code>overflow-x</code> / <code>overflow: auto</code>. Overflow strategy is consistent — almost every table has it. This is the only responsiveness axis that survives in the monolith.
+    </div>
+  </div>
+
+  <div class="axis-card na-card">
+    <div class="head">
+      <span class="num">A02</span>
+      <span class="axis-name">Library convention</span>
+      <span class="status na">OK · N/A</span>
+      <span class="scope">no variant API in this stack</span>
+    </div>
+    <div class="single">
+      Inline-style React + in-file primitives (<code>Btn</code>, <code>Badge</code>, <code>Card</code>) have no formal variant/tone enum to fight. Tone is communicated by passing color values inline — there's nothing for call sites to "bypass". This axis applies to shadcn / Radix / MUI / Mantine / RN-Paper, but not here.
+    </div>
+  </div>
+
+  <h2 class="section-title">Section 2 · Region in context <span class="sub">App.js · Dashboard region — drift-density hotspot (no h1, hand-rolled toolbar, 4× hex palette, chart without aria-label)</span></h2>
+  <div class="context-wrap">
+    <div class="context-pair">
+      <div class="frame bad">
+        <div class="frame-tag"><span style="display:inline-block;width:8px;height:8px;border-radius:99px;background:currentColor;"></span> Before <span class="meta">A01 + A03 + A04 + A05 + A07 + A08 + A09 + A10</span></div>
+        <div class="page-mock dark">
+          <div class="row-with-note"><span class="note bad">A05 — no semantic h1 (styled div)</span><span class="note bad">A03 — inline page chrome</span></div>
+          <div class="dq-h1-bad">Dashboard</div>
+          <div class="row-with-note" style="margin-top:6px;"><span class="note bad">A01 — raw &lt;button&gt; bypass</span></div>
+          <div class="dq-toolbar">
+            <span class="dq-pill active" style="border-radius:99px;">Last 24h</span>
+            <span class="dq-pill" style="border-radius:99px;">Last 7d</span>
+            <span class="dq-pill" style="border-radius:99px;">Last 30d</span>
+            <span class="dq-pill" style="border-radius:99px;">Custom</span>
+            <button style="margin-left:auto;font-size:11px;padding:4px 10px;border-radius:6px;background:#292524;color:#F5F5F4;border:1px solid #44403C;">+ Add monitor</button>
+          </div>
+          <div class="row-with-note"><span class="note bad">A07 — fixed 4-column grid</span><span class="note bad">A11 — no tabular-nums</span></div>
+          <div class="dq-grid">
+            <div class="dq-card"><div class="lbl">Score</div><div class="val">87.4</div><div class="delta">+1.2 vs yest</div></div>
+            <div class="dq-card"><div class="lbl">Open alerts</div><div class="val">14</div><div class="delta">3 critical</div></div>
+            <div class="dq-card"><div class="lbl">Avg latency</div><div class="val">182 ms</div><div class="delta">−4 ms</div></div>
+            <div class="dq-card"><div class="lbl">Rows checked</div><div class="val">1,234,567</div><div class="delta">today</div></div>
+          </div>
+          <div class="row-with-note"><span class="note bad">A04 — raw hex palette</span><span class="note bad">A08 — chart has no aria-label</span><span class="note bad">A09 — transitions always on</span></div>
+          <div class="dq-chart">
+            <div style="font-size:10px;color:#A8A29E;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:6px;">Severity mix · 30d</div>
+            <div class="bars">
+              <div class="bar" style="height:25%;background:#F59E0B;"></div>
+              <div class="bar" style="height:42%;background:#f97316;"></div>
+              <div class="bar" style="height:60%;background:#EF4444;"></div>
+              <div class="bar" style="height:38%;background:#10B981;"></div>
+              <div class="bar" style="height:55%;background:#8B5CF6;"></div>
+              <div class="bar" style="height:70%;background:#6366f1;"></div>
+              <div class="bar" style="height:30%;background:#06B6D4;"></div>
+            </div>
+          </div>
+          <div class="row-with-note"><span class="note bad">A10 — raw input without htmlFor</span></div>
+          <input placeholder="Filter monitors…" style="font-size:11px;padding:5px 9px;border-radius:6px;background:#292524;color:#F5F5F4;border:1px solid #44403C;margin-top:6px;width:60%;" />
+        </div>
+      </div>
+      <div class="frame good">
+        <div class="frame-tag"><span style="display:inline-block;width:8px;height:8px;border-radius:99px;background:currentColor;"></span> After <span class="meta">A01 + A03 + A04 + A05 + A07 + A08 + A09 + A10 resolved</span></div>
+        <div class="page-mock dark">
+          <div class="row-with-note"><span class="note good">A05 + A03 — PageHeader with semantic h1</span></div>
+          <h1 class="dq-h1-good">Dashboard</h1>
+          <div style="height:1px;background:#44403C;margin:6px 0 12px;"></div>
+          <div class="row-with-note"><span class="note good">A01 — &lt;Btn&gt; primitive</span></div>
+          <div class="dq-toolbar">
+            <span class="dq-pill fixed active">Last 24h</span>
+            <span class="dq-pill fixed">Last 7d</span>
+            <span class="dq-pill fixed">Last 30d</span>
+            <span class="dq-pill fixed">Custom</span>
+            <span style="margin-left:auto;font-size:11px;padding:5px 11px;border-radius:7px;background:#F59E0B;color:#1C1917;border:1px solid #F59E0B;cursor:pointer;font-weight:600;">+ Add monitor</span>
+          </div>
+          <div class="row-with-note"><span class="note good">A07 — adaptive useCols hook</span><span class="note good">A11 — tabular-nums</span></div>
+          <div class="dq-grid fixed">
+            <div class="dq-card fixed"><div class="lbl">Score</div><div class="val fixed">87.4</div><div class="delta">+1.2 vs yest</div></div>
+            <div class="dq-card fixed"><div class="lbl">Open alerts</div><div class="val fixed">14</div><div class="delta">3 critical</div></div>
+            <div class="dq-card fixed"><div class="lbl">Avg latency</div><div class="val fixed">182 ms</div><div class="delta">−4 ms</div></div>
+            <div class="dq-card fixed"><div class="lbl">Rows checked</div><div class="val fixed">1,234,567</div><div class="delta">today</div></div>
+          </div>
+          <div class="row-with-note"><span class="note good">A04 — CHART_PALETTE from theme</span><span class="note good">A08 — aria-label</span><span class="note good">A09 — useReducedMotion</span></div>
+          <div class="dq-chart fixed">
+            <div style="font-size:10px;color:#A8A29E;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:6px;">Severity mix · 30d</div>
+            <div class="bars">
+              <div class="bar" style="height:25%"></div>
+              <div class="bar" style="height:42%"></div>
+              <div class="bar" style="height:60%"></div>
+              <div class="bar" style="height:38%"></div>
+              <div class="bar" style="height:55%"></div>
+              <div class="bar" style="height:70%"></div>
+              <div class="bar" style="height:30%"></div>
+            </div>
+          </div>
+          <div class="row-with-note"><span class="note good">A10 — &lt;Input label="Filter"&gt; primitive</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px;margin-top:6px;">
+            <label style="font-size:10px;color:#A8A29E;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;">Filter</label>
+            <input placeholder="monitors…" style="font-size:11px;padding:5px 9px;border-radius:7px;background:#292524;color:#F5F5F4;border:1px solid #44403C;width:60%;" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Step 7 · suggested execution order <span class="sub">tree shape first, then primitives, then mechanical sweeps</span></h2>
+  <ol style="font-size:13px;line-height:1.7;padding-left:22px;">
+    <li><strong>Split App.js into ~25 files</strong> (A03). Prerequisite — every other axis is easier once components are file-scoped.</li>
+    <li><strong>Promote in-file primitives</strong> (A01): <code>Btn</code> / <code>Badge</code> / <code>Card</code> into <code>ui/</code>, add new <code>PageHeader</code> / <code>Eyebrow</code> / <code>Input</code> / <code>Spinner</code> / <code>NumericCell</code>.</li>
+    <li><strong>Define token tables</strong> in <code>theme.js</code> (A04, A05, A06): <code>CHART_PALETTE</code>, <code>TYPE</code>, <code>RADII</code> — and case-normalise the hex literals scattered through chart configs.</li>
+    <li><strong>Adoption sweep</strong> for the new primitives — 281 raw <code>&lt;button&gt;</code> → <code>&lt;Btn&gt;</code>; 154 raw <code>&lt;input&gt;</code> → <code>&lt;Input&gt;</code>.</li>
+    <li><strong>Responsive scaffold</strong> (A07): one <code>useWindowWidth</code> hook + <code>useCols</code> on top-level grids.</li>
+    <li><strong>A11y + motion sweep</strong> (A08, A09): aria-labels on icon buttons + charts; <code>useReducedMotion</code> gate on the 195 transitions.</li>
+    <li><strong>Hygiene cherry-on-top</strong> (A13). Already clean — keep it that way after the split.</li>
+  </ol>
+
+  <div class="footer-note">
+    <div>Audit produced by the <a href="https://github.com/sumedh-png/style-drift">style-drift</a> Claude Code skill. Read-only — no source files were modified.</div>
+    <div><code>samples/data-quality.html</code></div>
+  </div>
+</div>
+</body>
+</html>
